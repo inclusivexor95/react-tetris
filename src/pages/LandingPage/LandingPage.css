@@ -1,0 +1,15 @@
+.LandingPage {
+    height: 98vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12vh 0 0 0;
+}
+
+.LandingPage > img {
+    height: 20vh;
+    position: absolute;
+    top: 2vh;
+    left: calc(50% - 14.39vh);
+    z-index: -10;
+}

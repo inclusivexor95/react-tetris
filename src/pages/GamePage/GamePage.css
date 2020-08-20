@@ -1,0 +1,159 @@
+.GamePage {
+    height: 98vh;
+    padding: 2vh 0;
+    display: flex;
+    justify-content: center;
+}
+
+.GameBoard {
+    background-color: black;
+    height: 92vh;
+    /* height: 100%; */
+    width: 46vh;
+    display: flex;
+    flex-wrap: wrap-reverse;
+}
+
+.BoardSquare {
+    border: 1px solid transparent;
+    width: 4.6vh;
+    height: 4.6vh;
+}
+
+.VisibleSquare {
+    border: 1px solid white;
+}
+
+#startButton {
+    position: absolute;
+    top: 50%;
+    width: 5%;
+    height: 5%;
+    left: 47.5%;
+    background-color: red;
+    border: 2px solid black;
+}
+
+#startButton:hover {
+    cursor: pointer;
+    color: grey;
+    border: 2px solid grey;
+}
+
+.NextList, .InfoBox {
+    border: 1px solid black;
+    height: 92vh;
+    width: 35vh;
+    background-color: rgba(100, 100, 100, 0.4);
+    margin: 0 1rem;
+}
+
+.NextList {
+    border-radius: 0 1rem 0 0;
+}
+
+.NextList h2 {
+    height: 5vh;
+    margin: 0;
+    padding: calc(2.5vh - 0.8625rem);
+    color: white;
+    background-color: black;
+    border-radius: 0 1rem 0 0;
+}
+
+#nextTetrominoes {
+    height: calc(100% - 5vh);
+    /* height: 87vh; */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#nextTetrominoes > div {
+    height: calc(87vh / (21 / 2));
+    width: calc(87vh / (21 / 4));
+    margin: calc(87vh / 42) 0;
+    border: 1px solid white;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#nextTetrominoes > div:first-child {
+    height: calc(87vh / (10.5 / 2));
+    width: calc(87vh / (10.5 / 4));
+    margin: calc(87vh / 21) 0;
+}
+
+#nextTetrominoes > div > div {
+    width: 25%;
+    height: 50%;
+}
+
+#nextTetrominoes > div .MinoDiv {
+    border: 1px solid darkslategray;
+}
+
+.InfoBox {
+    border-radius: 1rem 0 0 0;
+}
+
+
+
+
+
+
+.TetrominoI .MinoDiv {
+    background-color: cyan;
+}
+
+.TetrominoJ .MinoDiv {
+    background-color: blue;
+}
+
+.TetrominoL .MinoDiv {
+    background-color: orange;
+}
+
+.TetrominoO .MinoDiv {
+    background-color: yellow;
+}
+
+.TetrominoS .MinoDiv {
+    background-color: green;
+}
+
+.TetrominoT .MinoDiv {
+    background-color: purple;
+}
+
+.TetrominoZ .MinoDiv {
+    background-color: red;
+}
+
+.Value1 {
+    background-color: cyan;
+}
+
+.Value2 {
+    background-color: blue;
+}
+
+.Value3 {
+    background-color: orange;
+}
+
+.Value4 {
+    background-color: yellow;
+}
+
+.Value5 {
+    background-color: green;
+}
+
+.Value6 {
+    background-color: purple;
+}
+
+.Value7 {
+    background-color: red;
+}

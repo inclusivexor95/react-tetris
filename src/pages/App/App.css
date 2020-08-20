@@ -1,0 +1,14 @@
+.App {
+    background-image: url(/assets/landscape.jpg);
+    text-align: center;
+    padding: 2vh 0 0 0;
+    z-index: -20;
+    position: absolute;
+    width: 100%;
+}
+
+.Wrapper {
+    width: 80%;
+    max-width: 1300px;
+    margin: 0 auto;
+}
