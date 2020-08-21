@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 
-const NextList = ({ sevenBag, tetrominoIndex }) => {
+const NextList = ({ sevenBag, tetrominoIndex, nextSeven, currentTetromino }) => {
 
     const [tetrominoHTML, setTetrominoHTML] = useState({
         stateHTML: []
@@ -18,19 +18,15 @@ const NextList = ({ sevenBag, tetrominoIndex }) => {
     };
 
     const displayTetrominoes = () => {
-        // newHTML.length = 0;
-        // sevenBag.forEach((tetrominoId, index) => {
-        //     tetrominoHTML[index] = <div className="Tetromino"></div>;
-        //     console.log(tetrominoHTML);
-        // });
 
-        const newHTML = sevenBag.map((tetrominoId, index) => {
-            if (index > 0) {
+        const fullList = sevenBag.concat(nextSeven);
+
+        const newHTML = fullList.map((tetrominoId, index) => {
+            if (currentTetromino < index && index < (currentTetromino + 7)) {
                 return generateTetrominoHTML(tetrominoId);
             };
         });
 
-        // const newObject = {stateHTML: newHTML};
         const newObject = {...tetrominoHTML, ...{stateHTML: newHTML}};
         
         setTetrominoHTML(newObject);
@@ -38,14 +34,13 @@ const NextList = ({ sevenBag, tetrominoIndex }) => {
 
     useEffect(() => {
         displayTetrominoes();
-    }, [sevenBag.length]);
+    }, [sevenBag.length, currentTetromino]);
     
     return (
         <div className='NextList'>
             <h2>NEXT</h2>
             <div id="nextTetrominoes">
                 {tetrominoHTML.stateHTML}
-                {/* {newHTML} */}
             </div>
         </div>
     );
