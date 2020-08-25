@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 
 const GameBoard = ({ startGame, boardArray }) => {
@@ -8,8 +8,12 @@ const GameBoard = ({ startGame, boardArray }) => {
         startGame();
     };
 
+    const handleChange = () => {
+        console.log('change');
+    };
+
     return (
-        <div className="GameBoard">
+        <div className="GameBoard" onChange={handleChange}>
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][0]}></div>
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][1]}></div>
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][2]}></div>
