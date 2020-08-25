@@ -249,20 +249,9 @@ const GamePage = () => {
             setCurrentTetCoords(newTetCoords);
             updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
         }
-        else if (lockGravityRef.current = true && y === -1) {
-            if (tetReady === true) {
-                clearInterval(window.tickInterval);
-                console.log('game over');
-            };
-            if (currentTetromino === 6) {
-                setSevenBag([...nextSeven]);
-                generateBag(false);
-                setCurrentTetromino(0);
-            }
-            else {
-                setCurrentTetromino(currentTetromino + 1);
-            };
-            setTetReady(true);
+        else if (lockGravityRef.current === true && y === -1) {
+            console.log('stopping because of collisiond');
+            softDrop(false);
         }
         else {
             console.log('collision');
@@ -270,7 +259,7 @@ const GamePage = () => {
     };
 
     const softDrop = (startStop) => {
-        if (startStop && lockGravityRef.current === false) {
+        if (startStop) {
             lockGravityRef.current = true;
             window.softDropInterval = setInterval(() => {
                 shiftTetromino(0, -1);
@@ -294,13 +283,16 @@ const GamePage = () => {
                     shiftTetromino(1, 0);
                     break;
                 case 40:
-                    softDrop(true);
+                    if (lockGravityRef.current === false) {
+                        softDrop(true);
+                    };
                     break;
                 default:
                     break;
             };
         }
         else if (e.type === 'keyup' && e.keyCode === 40) {
+            console.log('stopping because of keyup');
             softDrop(false);
         };
     };
