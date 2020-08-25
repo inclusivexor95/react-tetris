@@ -8,7 +8,7 @@ import InfoBox from '../../components/InfoBox/InfoBox';
 const GamePage = () => {
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
-    const [movement, setMovement] = useState(0);
+    const [movement, setMovement] = useState(false);
     const [boardAltered, setBoardAltered] = useState(0);
     const [currentTetromino, setCurrentTetromino] = useState(0);
     const [tetReady, setTetReady] = useState(false);
@@ -129,54 +129,38 @@ const GamePage = () => {
         randomTetromino();
     };
 
-    const updateTetPos = (eventCase = false) => {
-        // console.log(currentTetCoords, prevTetCoords);
+    const updateTetPos = (newCoords, oldCoords, board, eventCase = false) => {
         const whichNumber = sevenBag[currentTetromino] + 1;
-        // const arrayClone = [...boardArray];
-        const arrayClone = boardRef.current;
+        // const arrayClone = boardRef.current;
+        const arrayClone = board;
 
-        let prevCoords;
-        let currentCoords;
+        // let prevCoords;
+        // let currentCoords;
 
-        if (eventCase) {
-            prevCoords = prevCoordsRef.current;
-            currentCoords = coordsRef.current;
-        }
-        else {
-            prevCoords = prevTetCoords;
-            currentCoords = currentTetCoords;
-        };
+        // if (eventCase) {
+        // //     prevCoords = prevCoordsRef.current;
+        // //     currentCoords = coordsRef.current;
+        //     arrayClone = board;
+        // }
+        // else {
+        // //     prevCoords = prevTetCoords;
+        // //     currentCoords = currentTetCoords;
+        //     arrayClone = boardRef.current;
+        // };
 
-        // console.log('moving from ', prevCoords, ' to ', currentCoords);
-        
-        // prevTetCoords.forEach((minoCoord) => {
-        //     arrayClone[minoCoord[0]][minoCoord[1]] = 0;
-        // });
-
-        // currentTetCoords.forEach((minoCoord) => {
-        //     arrayClone[minoCoord[0]][minoCoord[1]] = whichNumber;
-        // });
-        prevCoords.forEach((minoCoord) => {
+        oldCoords.forEach((minoCoord) => {
+            console.log('board: ', board[minoCoord[0]][minoCoord[1]]);
             arrayClone[minoCoord[0]][minoCoord[1]] = 0;
         });
-
-        currentCoords.forEach((minoCoord) => {
+        
+        newCoords.forEach((minoCoord) => {
             arrayClone[minoCoord[0]][minoCoord[1]] = whichNumber;
-            // console.log(arrayClone[minoCoord[0]][minoCoord[1]]);
+            console.log('newboard: ', board[minoCoord[0]][minoCoord[1]]);
         });
-
-        // console.log(arrayClone);
-        // currentCoords.forEach((minoCoord) => {
-        // })
-
-        // console.log(arrayClone, currentCoords, whichNumber);
 
         setBoardArray(arrayClone);
         setBoardAltered(boardAltered + 1);
-        // boardRef.current = arrayClone;
-        // console.log(boardRef.current);
-        setPrevTetCoords(currentCoords);
-        // setPrevTetCoords(currentTetCoords);
+        setPrevTetCoords(newCoords);
     };
 
     const createTetromino = () => {
@@ -199,54 +183,40 @@ const GamePage = () => {
         setPrevTetCoords(tetCoords);
     };
 
-    const collisionDetection = (coords, eventCase = false) => {
-        let currentCoords;
+    const collisionDetection = (newCoords, oldCoords, eventCase = false) => {
         let board;
 
         if (eventCase) {
-            // prevCoords = prevCoordsRef.current;
-            currentCoords = prevCoordsRef.current;
             board = boardRef.current;
         }
         else {
-            // prevCoords = prevTetCoords;
-            currentCoords = currentTetCoords;
             board = boardArray;
         };
         // returns only brand new coordinates (to avoid false positives with old position)
-        const newCoords = coords.filter((newMinoCoord) => {
-            return currentCoords.every((oldMinoCoord) => {
-                if (newMinoCoord[0] !== oldMinoCoord[0] || newMinoCoord[1] !== oldMinoCoord[1]) {
-                    // console.log(newMinoCoord, ' and ', oldMinoCoord, ' are different');
-                }
+        const brandNewCoords = newCoords.filter((newMinoCoord) => {
+            return oldCoords.every((oldMinoCoord) => {
                 return (newMinoCoord[0] !== oldMinoCoord[0] || newMinoCoord[1] !== oldMinoCoord[1]);
             });
         });
-        // console.log('checking new ', newCoords, ' for collision, current coords are ', currentCoords);
-        console.log(currentTetCoords, coords)
-        // checks if any new coordinates are occupied
-        // return newCoords.some((newMinoCoord) => {
-        //     return (newMinoCoord[0] < 0 || boardArray[newMinoCoord[0]][newMinoCoord[1]] !== 0);
-        // });
-        return newCoords.some((newMinoCoord) => {
-            if (newMinoCoord[0] < 0 || boardArray[newMinoCoord[0]][newMinoCoord[1]] !== 0) {
+        
+        return brandNewCoords.some((newMinoCoord) => {
+            if (newMinoCoord[0] < 0 || board[newMinoCoord[0]][newMinoCoord[1]] !== 0) {
                 console.log('collision, newCoords are ', newCoords, 'board looks like', boardArray, ' collision is at ', newMinoCoord);
-            //     return true;
             };
             return (newMinoCoord[0] < 0 || board[newMinoCoord[0]][newMinoCoord[1]] !== 0);
-        }); 
+        });
+
     };
 
     const gravity = () => {
-        // const tetCoords = [...currentTetCoords];
-
         const newTetCoords = currentTetCoords.map((minoCoord) => {
             return [minoCoord[0] - 1, minoCoord[1]];
         });
         
-        if (!collisionDetection(newTetCoords)) {
+        if (!collisionDetection(newTetCoords, currentTetCoords)) {
             setCurrentTetCoords(newTetCoords);
-            setMovement(movement + 1);
+            updateTetPos(newTetCoords, currentTetCoords, boardRef.current);
+            setMovement(true);
         }
         else {
             if (tetReady === true) {
@@ -266,17 +236,18 @@ const GamePage = () => {
     };
 
     const shiftTetromino = (x, y) => {
-        const newTetCoords = coordsRef.current.map((minoCoord) => {
-            // console.log(currentTetCoords);
+        const currentCoords = coordsRef.current;
+        const newTetCoords = currentCoords.map((minoCoord) => {
             return [minoCoord[0] + y, minoCoord[1] + x];
         });
-        // console.log('moving ', x, y, ' from ', coordsRef.current, ' to ', newTetCoords);
-        if (!collisionDetection(newTetCoords, true)) {
-            console.log('no collision');
+        if (!collisionDetection(newTetCoords, currentCoords, true)) {
+            currentCoords.forEach((minoCoord) => {
+                console.log('boardArray: ', boardArray[minoCoord[0]][minoCoord[1]], 'boardRef: ', boardRef.current[minoCoord[0]][minoCoord[1]]);
+            });
+            // console.log('no collision');
             setCurrentTetCoords(newTetCoords);
+            updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
             setMovement(movement + 1);
-            updateTetPos(true);
-            // console.log('working', shiftedCoords);
         }
         else {
             console.log('collision');
@@ -287,23 +258,13 @@ const GamePage = () => {
         
         switch(e.keyCode) {
             case 37:
-                // newTetCoords = currentTetCoords.map((minoCoord) => {
-                //     return [minoCoord[0], minoCoord[1] - 1];
-                // });
-                // if (!collisionDetection(newTetCoords)) {
-                //     setCurrentTetCoords(newTetCoords);
-                //     console.log('working', newTetCoords);
-                // };
                 shiftTetromino(-1, 0);
+                // console.log('left');
                 break;
             case 39:
-                // newTetCoords = currentTetCoords.map((minoCoord) => {
-                //     return [minoCoord[0], minoCoord[1] + 1];
-                // });
-                // if (!collisionDetection(newTetCoords)) {
-                //     setCurrentTetCoords(newTetCoords);
-                // };
+            
                 shiftTetromino(1, 0);
+                // console.log('right');
                 break;
             default:
                 break;
@@ -322,7 +283,7 @@ const GamePage = () => {
         if (currentTetCoords.length > 0) {
             
             gravity();
-            updateTetPos();
+            // updateTetPos();
             
             if (tetReady === true) {
                 setTetReady(false);
@@ -331,21 +292,20 @@ const GamePage = () => {
     }, [tick]);
 
     useEffect(() => {
-        coordsRef.current = currentTetCoords;
-        prevCoordsRef.current = prevTetCoords;
-        
-        // console.log('movement', coordsRef.current);
+        if (movement === true) {
+            coordsRef.current = currentTetCoords;
+            prevCoordsRef.current = prevTetCoords;
+            setMovement(false);
+        };
     }, [movement]);
 
     useEffect(() => {
         boardRef.current = boardArray;
-        // console.log(boardRef.current);
     }, [boardAltered]);
 
     useEffect(() => {
         if (tetReady === true) {
             createTetromino();
-            // setTetReady(false);
         };
     }, [tetReady]);
 
