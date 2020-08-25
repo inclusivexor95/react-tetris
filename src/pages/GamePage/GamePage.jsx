@@ -9,7 +9,8 @@ const GamePage = () => {
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     const [movement, setMovement] = useState(false);
-    const [boardAltered, setBoardAltered] = useState(0);
+    const [boardAltered, setBoardAltered] = useState(false);
+    const [gravityBool, setGravityBool] = useState(false);
     const [currentTetromino, setCurrentTetromino] = useState(0);
     const [tetReady, setTetReady] = useState(false);
     const [currentTetCoords, setCurrentTetCoords] = useState([]);
@@ -61,6 +62,8 @@ const GamePage = () => {
     const coordsRef = useRef(currentTetCoords);
     const prevCoordsRef = useRef(prevTetCoords);
     const boardRef = useRef(boardArray);
+    const bagRef = useRef(sevenBag);
+    const tetRef = useRef(currentTetromino);
     
     const tetrominoIndex = [
         {
@@ -130,36 +133,23 @@ const GamePage = () => {
     };
 
     const updateTetPos = (newCoords, oldCoords, board, eventCase = false) => {
-        const whichNumber = sevenBag[currentTetromino] + 1;
-        // const arrayClone = boardRef.current;
-        const arrayClone = board;
+        const whichNumber = bagRef.current[tetRef.current] + 1;
+        const arrayClone = board.map(row => row.slice());
 
-        // let prevCoords;
-        // let currentCoords;
+        // console.log('current tet: ', currentTetromino, ' seven bag: ', sevenBag, 'bagref: ', bagRef.current);
 
-        // if (eventCase) {
-        // //     prevCoords = prevCoordsRef.current;
-        // //     currentCoords = coordsRef.current;
-        //     arrayClone = board;
-        // }
-        // else {
-        // //     prevCoords = prevTetCoords;
-        // //     currentCoords = currentTetCoords;
-        //     arrayClone = boardRef.current;
-        // };
-
+        console.log('erasing: ', oldCoords, ' number: ', whichNumber, ' board: ', arrayClone);
         oldCoords.forEach((minoCoord) => {
-            console.log('board: ', board[minoCoord[0]][minoCoord[1]]);
             arrayClone[minoCoord[0]][minoCoord[1]] = 0;
         });
         
         newCoords.forEach((minoCoord) => {
             arrayClone[minoCoord[0]][minoCoord[1]] = whichNumber;
-            console.log('newboard: ', board[minoCoord[0]][minoCoord[1]]);
+            // console.log('newboard: ', arrayClone[minoCoord[0]]);
         });
 
         setBoardArray(arrayClone);
-        setBoardAltered(boardAltered + 1);
+        setBoardAltered(true);
         setPrevTetCoords(newCoords);
     };
 
@@ -192,6 +182,7 @@ const GamePage = () => {
         else {
             board = boardArray;
         };
+
         // returns only brand new coordinates (to avoid false positives with old position)
         const brandNewCoords = newCoords.filter((newMinoCoord) => {
             return oldCoords.every((oldMinoCoord) => {
@@ -200,9 +191,9 @@ const GamePage = () => {
         });
         
         return brandNewCoords.some((newMinoCoord) => {
-            if (newMinoCoord[0] < 0 || board[newMinoCoord[0]][newMinoCoord[1]] !== 0) {
-                console.log('collision, newCoords are ', newCoords, 'board looks like', boardArray, ' collision is at ', newMinoCoord);
-            };
+            // if (newMinoCoord[0] < 0 || board[newMinoCoord[0]][newMinoCoord[1]] !== 0) {
+            //     console.log('collision, newCoords are ', newCoords, 'oldCoords are ', oldCoords, ' collision is at ', newMinoCoord, ' boardrow: ', board[newMinoCoord[0]]);
+            // };
             return (newMinoCoord[0] < 0 || board[newMinoCoord[0]][newMinoCoord[1]] !== 0);
         });
 
@@ -241,13 +232,13 @@ const GamePage = () => {
             return [minoCoord[0] + y, minoCoord[1] + x];
         });
         if (!collisionDetection(newTetCoords, currentCoords, true)) {
-            currentCoords.forEach((minoCoord) => {
-                console.log('boardArray: ', boardArray[minoCoord[0]][minoCoord[1]], 'boardRef: ', boardRef.current[minoCoord[0]][minoCoord[1]]);
-            });
+            // currentCoords.forEach((minoCoord) => {
+            //     console.log('boardArray: ', boardArray[minoCoord[0]][minoCoord[1]], 'boardRef: ', boardRef.current[minoCoord[0]][minoCoord[1]]);
+            // });
             // console.log('no collision');
             setCurrentTetCoords(newTetCoords);
             updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
-            setMovement(movement + 1);
+            setMovement(true);
         }
         else {
             console.log('collision');
@@ -255,19 +246,18 @@ const GamePage = () => {
     };
 
     const controllerFunction = (e) => {
-        
-        switch(e.keyCode) {
-            case 37:
-                shiftTetromino(-1, 0);
-                // console.log('left');
-                break;
-            case 39:
-            
-                shiftTetromino(1, 0);
-                // console.log('right');
-                break;
-            default:
-                break;
+        if (!movement && !boardAltered && !gravityBool) {
+            switch(e.keyCode) {
+                case 37:
+                    shiftTetromino(-1, 0);
+                    break;
+                case 39:
+                
+                    shiftTetromino(1, 0);
+                    break;
+                default:
+                    break;
+            };
         };
     };
 
@@ -281,26 +271,36 @@ const GamePage = () => {
 
     useEffect(() => {
         if (currentTetCoords.length > 0) {
-            
+
+            setGravityBool(true);
             gravity();
             // updateTetPos();
             
             if (tetReady === true) {
                 setTetReady(false);
             };
+
+            bagRef.current = sevenBag;
+            tetRef.current = currentTetromino;
         };
     }, [tick]);
 
     useEffect(() => {
-        if (movement === true) {
+        if (movement) {
             coordsRef.current = currentTetCoords;
             prevCoordsRef.current = prevTetCoords;
             setMovement(false);
+            if (gravityBool) {
+                setGravityBool(false);
+            };
         };
     }, [movement]);
 
     useEffect(() => {
-        boardRef.current = boardArray;
+        if (boardAltered) {
+            boardRef.current = boardArray;
+            setBoardAltered(false);
+        };
     }, [boardAltered]);
 
     useEffect(() => {
