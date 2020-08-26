@@ -75,14 +75,14 @@ const GamePage = () => {
             shape: [0, 0, 0, 0, 1, 1, 1, 1],
             rotation: [[[2, 1], [1, 0], [0, -1], [-1, -2]], [[1, -2], [0, -1], [-1, 0], [-2, 1]], [[-2, -1], [-1, 0], [0, 1], [1, 2]], [[-1, 2], [0, 1], [1, 0], [2, -1]]],
             wallKick: {
-                '01': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
-                '10': [[2, 0], [-1, 0], [2, 1], [-1,-2]],
-                '12': [[-1, 0], [2, 0], [-1, 2], [2, -1]],
-                '21': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
-                '23': [[2, 0], [-1, 0], [2, 1], [-1, -2]],
-                '32': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
-                '30': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
-                '03': [[-1, 0], [2, 0], [-1, 2], [2, -1]]
+                '0>1': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
+                '1>0': [[2, 0], [-1, 0], [2, 1], [-1,-2]],
+                '1>2': [[-1, 0], [2, 0], [-1, 2], [2, -1]],
+                '2>1': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
+                '2>3': [[2, 0], [-1, 0], [2, 1], [-1, -2]],
+                '3>2': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
+                '3>0': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
+                '0>3': [[-1, 0], [2, 0], [-1, 2], [2, -1]]
             }
         },
         {
@@ -376,21 +376,45 @@ const GamePage = () => {
             };
         });
 
-        if (!collisionDetection(newCoords, coordsRef.current, true)) {
-            if (direction === 'cw') {
-                if (rotationIndex === 3) {
-                    rotationIndex = 0;
-                }
-                else {
-                    rotationIndex++;
-                };
+        if (direction === 'cw') {
+            if (rotationIndex === 3) {
+                rotationIndex = 0;
+            }
+            else {
+                rotationIndex++;
             };
+        };
+
+        if (!collisionDetection(newCoords, coordsRef.current, true)) {
             setRotation(rotationIndex);
             setCurrentTetCoords(newCoords);
             updateTetPos(newCoords, coordsRef.current, boardRef.current, true);
         }
         else {
-            console.log('rotation collision');
+            const wallKickResult = doWallKick(newCoords, coordsRef.current, `${rotationRef.current}>${rotationIndex}`, tetrominoIndex[bagRef.current[tetRef.current]]);
+
+            if (wallKickResult) {
+                setRotation(rotationIndex);
+                setCurrentTetCoords(wallKickResult);
+                updateTetPos(wallKickResult, coordsRef.current, boardRef.current, true);
+            }
+            else {
+                console.log('rotation collision');
+            };
+        };
+    };
+
+    const doWallKick = (newCoords, currentCoords, kickString, tetData) => {
+        let newNewCoords;
+
+        if (tetData.wallKick[kickString].find((testCoords) => {
+            newNewCoords = newCoords.map((minoCoord) => {
+                return [minoCoord[0] + testCoords[1], minoCoord[1] + testCoords[0]];
+            });
+
+            return !collisionDetection(newNewCoords, currentCoords, true);
+        })) {
+            return newNewCoords;
         };
     };
 
