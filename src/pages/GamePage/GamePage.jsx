@@ -12,6 +12,7 @@ const GamePage = () => {
     const [tetReady, setTetReady] = useState(false);
     const [currentTetCoords, setCurrentTetCoords] = useState([]);
     const [prevTetCoords, setPrevTetCoords] = useState([]);
+    const [rotation, setRotation] = useState(0);
     const [tick, setTick] = useState(0);
     const [boardArray, setBoardArray] = useState([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -62,6 +63,7 @@ const GamePage = () => {
     const boardRef = useRef(boardArray);
     const bagRef = useRef(sevenBag);
     const tetRef = useRef(currentTetromino);
+    const rotationRef = useRef(rotation);
 
     const lockMovementRef = useRef(false);
     const lockGravityRef = useRef(false);
@@ -71,37 +73,107 @@ const GamePage = () => {
         {
             name: 'I',
             shape: [0, 0, 0, 0, 1, 1, 1, 1],
-            rotation: [[[2, 1], [1, 0], [0, -1], [-1, -2]], [[1, -2], [0, -1], [-1, 0], [-2, 1]], [[-2, -1], [-1, 0], [0, 1], [1, 2]], [[-1, 2], [0, 1], [1, 0], [2, -1]]]
+            rotation: [[[2, 1], [1, 0], [0, -1], [-1, -2]], [[1, -2], [0, -1], [-1, 0], [-2, 1]], [[-2, -1], [-1, 0], [0, 1], [1, 2]], [[-1, 2], [0, 1], [1, 0], [2, -1]]],
+            wallKick: {
+                '01': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
+                '10': [[2, 0], [-1, 0], [2, 1], [-1,-2]],
+                '12': [[-1, 0], [2, 0], [-1, 2], [2, -1]],
+                '21': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
+                '23': [[2, 0], [-1, 0], [2, 1], [-1, -2]],
+                '32': [[-2, 0], [1, 0], [-2, -1], [1, 2]],
+                '30': [[1, 0], [-2, 0], [1, -2], [-2, 1]],
+                '03': [[-1, 0], [2, 0], [-1, 2], [2, -1]]
+            }
         },
         {
             name: 'J',
             shape: [1, 0, 0, 0, 1, 1, 1, 0],
-            rotation: [[[2, 0], [1, 1], [0, 0], [-1, -1]], [[0, -2], [1, -1], [0, 0], [-1, 1]], [[-2, 0], [-1, -1], [0, 0], [1, 1]], [[0, 2], [-1, 1], [0, 0], [1, -1]]] 
+            rotation: [[[2, 0], [1, 1], [0, 0], [-1, -1]], [[0, -2], [1, -1], [0, 0], [-1, 1]], [[-2, 0], [-1, -1], [0, 0], [1, 1]], [[0, 2], [-1, 1], [0, 0], [1, -1]]],
+            wallKick: {
+                '0>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '1>0': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '1>2': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '2>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '2>3': [[1, 0], [1, 1], [0, -2], [1, -2]],
+                '3>2': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '3>0': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '0>3': [[1, 0], [1, 1], [0, -2], [1, -2]]
+            } 
         },
         {
             name: 'L',
             shape: [0, 0, 1, 0, 1, 1, 1, 0],
-            rotation: [[[0, -2], [1, 1], [0, 0], [-1, -1]], [[-2, 0], [1, -1], [0, 0], [-1, 1]], [[0, 2], [-1, -1], [0, 0], [1, 1]], [[2, 0], [-1, 1], [0, 0], [1, -1]]] 
+            rotation: [[[0, -2], [1, 1], [0, 0], [-1, -1]], [[-2, 0], [1, -1], [0, 0], [-1, 1]], [[0, 2], [-1, -1], [0, 0], [1, 1]], [[2, 0], [-1, 1], [0, 0], [1, -1]]],
+            wallKick: {
+                '0>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '1>0': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '1>2': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '2>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '2>3': [[1, 0], [1, 1], [0, -2], [1, -2]],
+                '3>2': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '3>0': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '0>3': [[1, 0], [1, 1], [0, -2], [1, -2]]
+            } 
         },
         {
             name: 'O',
             shape: [0, 1, 1, 0, 0, 1, 1, 0],
-            rotation: [[[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]]] 
+            rotation: [[[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]], [[0, 0], [0, 0], [0, 0], [0, 0]]],
+            wallKick: {
+                '0>1': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '1>0': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '1>2': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '2>1': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '2>3': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '3>2': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '3>0': [[0, 0], [0, 0], [0, 0], [0, 0]],
+                '0>3': [[0, 0], [0, 0], [0, 0], [0, 0]]
+            } 
         },
         {
             name: 'S',
             shape: [0, 1, 1, 0, 1, 1, 0, 0],
-            rotation: [[[1, -1], [0, -2], [1, 1], [0, 0]], [[-1, -1], [-2, 0], [1, -1], [0, 0]], [[-1, 1], [0, 2], [-1, -1], [0, 0]], [[1, 1], [2, 0], [-1, 1], [0, 0]]] 
+            rotation: [[[1, -1], [0, -2], [1, 1], [0, 0]], [[-1, -1], [-2, 0], [1, -1], [0, 0]], [[-1, 1], [0, 2], [-1, -1], [0, 0]], [[1, 1], [2, 0], [-1, 1], [0, 0]]],
+            wallKick: {
+                '0>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '1>0': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '1>2': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '2>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '2>3': [[1, 0], [1, 1], [0, -2], [1, -2]],
+                '3>2': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '3>0': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '0>3': [[1, 0], [1, 1], [0, -2], [1, -2]]
+            } 
         },
         {
             name: 'T',
             shape: [0, 1, 0, 0, 1, 1, 1, 0],
-            rotation: [[[1, -1], [1, 1], [0, 0], [-1, -1]], [[-1, -1], [1, -1], [0, 0], [-1, 1]], [[-1, 1], [-1, -1], [0, 0], [1, 1]], [[1, 1], [-1, 1], [0, 0], [1, -1]]] 
+            rotation: [[[1, -1], [1, 1], [0, 0], [-1, -1]], [[-1, -1], [1, -1], [0, 0], [-1, 1]], [[-1, 1], [-1, -1], [0, 0], [1, 1]], [[1, 1], [-1, 1], [0, 0], [1, -1]]],
+            wallKick: {
+                '0>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '1>0': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '1>2': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '2>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '2>3': [[1, 0], [1, 1], [0, -2], [1, -2]],
+                '3>2': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '3>0': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '0>3': [[1, 0], [1, 1], [0, -2], [1, -2]]
+            } 
         },
         {
             name: 'Z',
             shape: [1, 1, 0, 0, 0, 1, 1, 0],
-            rotation: [[[2, 0], [1, -1], [0, 0], [-1, -1]], [[0, -2], [-1, -1], [0, 0], [-1, 1]], [[-2, 0], [-1, 1], [0, 0], [1, 1]], [[0, 2], [1, 1], [0, 0], [1, -1]]] 
+            rotation: [[[2, 0], [1, -1], [0, 0], [-1, -1]], [[0, -2], [-1, -1], [0, 0], [-1, 1]], [[-2, 0], [-1, 1], [0, 0], [1, 1]], [[0, 2], [1, 1], [0, 0], [1, -1]]],
+            wallKick: {
+                '0>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '1>0': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '1>2': [[1, 0], [1, -1], [0, 2], [1, 2]],
+                '2>1': [[-1, 0], [-1, 1], [0, -2], [-1, -2]],
+                '2>3': [[1, 0], [1, 1], [0, -2], [1, -2]],
+                '3>2': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '3>0': [[-1, 0], [-1, -1], [0, 2], [-1, 2]],
+                '0>3': [[1, 0], [1, 1], [0, -2], [1, -2]]
+            } 
         },
     ];
 
@@ -241,6 +313,7 @@ const GamePage = () => {
             else {
                 setCurrentTetromino(currentTetromino + 1);
             };
+            setRotation(0);
             setTetReady(true);
         };
     };
@@ -257,7 +330,7 @@ const GamePage = () => {
             updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
         }
         else if (lockGravityRef.current === true && y === -1) {
-            console.log('stopping because of collisiond');
+            console.log('stopping because of collision');
             softDrop(false);
         }
         else {
@@ -278,8 +351,51 @@ const GamePage = () => {
         };
     };
 
+    const rotateTet = (direction) => {
+        let rotationIndex = rotationRef.current;
+
+        if (direction === 'ccw') {
+            if (rotationIndex === 0) {
+                rotationIndex = 3;
+            }
+            else {
+                rotationIndex--;
+            };
+        };
+
+        const rotationData = tetrominoIndex[bagRef.current[tetRef.current]].rotation[rotationIndex];
+
+        // console.log('rotating Tetromino ', bagRef.current[tetRef.current], ' ', direction, ' data: ', rotationData, ' from: ', rotationIndex);
+
+        const newCoords = coordsRef.current.map((minoCoord, index) => {
+            if (direction === 'cw') {
+                return [minoCoord[0] + rotationData[index][1], minoCoord[1] + rotationData[index][0]];
+            }
+            else if (direction === 'ccw') {
+                return [minoCoord[0] - rotationData[index][1], minoCoord[1] - rotationData[index][0]];
+            };
+        });
+
+        if (!collisionDetection(newCoords, coordsRef.current, true)) {
+            if (direction === 'cw') {
+                if (rotationIndex === 3) {
+                    rotationIndex = 0;
+                }
+                else {
+                    rotationIndex++;
+                };
+            };
+            setRotation(rotationIndex);
+            setCurrentTetCoords(newCoords);
+            updateTetPos(newCoords, coordsRef.current, boardRef.current, true);
+        }
+        else {
+            console.log('rotation collision');
+        };
+    };
+
     const controllerFunction = (e) => {
-        console.log('firing', e.type);
+        // console.log('firing', e.type);
         if (!lockMovementRef.current && e.type === 'keydown') {
             // console.log('firing', e.keyCode, lockMovementRef);
             switch(e.keyCode) {
@@ -293,6 +409,18 @@ const GamePage = () => {
                     if (lockGravityRef.current === false) {
                         softDrop(true);
                     };
+                    break;
+                case 38:
+                    rotateTet('cw');
+                    break;
+                case 88:
+                    rotateTet('cw');
+                    break;
+                case 90:
+                    rotateTet('ccw');
+                    break;
+                case 17:
+                    rotateTet('ccw');
                     break;
                 default:
                     break;
@@ -328,6 +456,7 @@ const GamePage = () => {
     }, [tick]);
 
     useEffect(() => {
+        rotationRef.current = rotation;
         tetRef.current = currentTetromino;
         coordsRef.current = currentTetCoords;
         prevCoordsRef.current = prevTetCoords;
