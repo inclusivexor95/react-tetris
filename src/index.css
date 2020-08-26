@@ -8,3 +8,16 @@ html { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: 
 
 .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; border: 0; padding: 0; white-space: nowrap; clip-path: inset(100%); clip: rect(0 0 0 0); overflow: hidden;}
 
+@font-face {
+    font-family: 'Michroma';
+    src: local('Michroma'), url(./fonts/Michroma-Regular.ttf) format('truetype');
+}
+
+@font-face {
+    font-family: 'SquadaOne';
+    src: local('SquadaOne'), url(./fonts/SquadaOne-Regular.ttf) format('truetype');
+}
+
+h2, p {
+    font-family: 'Michroma';
+}

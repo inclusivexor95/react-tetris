@@ -3,17 +3,14 @@ import React from 'react';
 
 const GameBoard = ({ startGame, boardArray }) => {
 
-    const handleStartClick = (e) => {
-        e.target.style.display = 'none';
+    const handleStartClick = () => {
+        const startButton = document.getElementById('startButton');
+        startButton.style.display = 'none';
         startGame();
     };
 
-    const handleChange = () => {
-        console.log('change');
-    };
-
     return (
-        <div className="GameBoard" onChange={handleChange}>
+        <div className="GameBoard">
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][0]}></div>
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][1]}></div>
             <div className={'VisibleSquare BoardSquare Value' + boardArray[0][2]}></div>
@@ -414,7 +411,7 @@ const GameBoard = ({ startGame, boardArray }) => {
             <div className='BoardSquare'></div>
             <div className='BoardSquare'></div>
             <div className='BoardSquare'></div>
-            <button id="startButton" onClick={handleStartClick}>START</button>
+            <button id="startButton" onClick={handleStartClick}><p>START</p></button>
         </div>
     );
 }

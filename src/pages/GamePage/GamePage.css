@@ -5,11 +5,25 @@
     justify-content: center;
 }
 
+.GameContainer {
+    width: 71vh;
+    /* height: 94vh; */
+    display: flex;
+    justify-content: flex-end;
+    /* border: 1vh solid turquoise; */
+    background-color: turquoise;
+    padding: 1vh 0;
+    border-radius: 0 1rem 0 0;
+    margin-left: 11vh;
+}
+
 .GameBoard {
     background-color: black;
+    /* border: 1rem solid turquoise; */
+    /* box-sizing: content-box; */
     height: 92vh;
     /* height: 100%; */
-    width: 46vh;
+    min-width: 46vh;
     display: flex;
     flex-wrap: wrap-reverse;
 }
@@ -21,17 +35,23 @@
 }
 
 .VisibleSquare {
-    border: 1px solid white;
+    border: 1px solid gray;
 }
 
 #startButton {
     position: absolute;
-    top: 50%;
-    width: 5%;
-    height: 5%;
-    left: 47.5%;
-    background-color: red;
+    top: 48%;
+    width: 6%;
+    height: 6%;
+    left: 47%;
+    background-color: #e06540;
     border: 2px solid black;
+    /* font-size: 80%; */
+    /* line-height: 1; */
+}
+
+#startButton p {
+    margin: 0;
 }
 
 #startButton:hover {
@@ -41,23 +61,26 @@
 }
 
 .NextList, .InfoBox {
-    border: 1px solid black;
-    height: 92vh;
-    width: 35vh;
-    background-color: rgba(100, 100, 100, 0.4);
-    margin: 0 1rem;
+    /* border: 1rem solid turquoise; */
+    /* border: 1rem solid white; */
+    /* height: 92vh; */
+    width: 22vh;
+    /* background-color: turquoise; */
+    margin: 0 1vh;
 }
 
 .NextList {
+    height: 92vh;
     border-radius: 0 1rem 0 0;
+    min-width: 22vh;
 }
 
-.NextList h2 {
+.NextList h2, .InfoBox h2 {
     height: 5vh;
     margin: 0;
     padding: calc(2.5vh - 0.8625rem);
-    color: white;
-    background-color: black;
+    color: black;
+    /* background-color: turquoise; */
     border-radius: 0 1rem 0 0;
 }
 
@@ -67,22 +90,23 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: black;
 }
 
 #nextTetrominoes > div {
     height: calc(87vh / (21 / 2));
     width: calc(87vh / (21 / 4));
     margin: calc(87vh / 42) 0;
-    border: 1px solid white;
+    /* border: 1px solid white; */
     display: flex;
     flex-wrap: wrap;
 }
 
-#nextTetrominoes > div:first-child {
+/* #nextTetrominoes > div:first-child {
     height: calc(87vh / (10.5 / 2));
     width: calc(87vh / (10.5 / 4));
     margin: calc(87vh / 21) 0;
-}
+} */
 
 #nextTetrominoes > div > div {
     width: 25%;
@@ -90,12 +114,39 @@
 }
 
 #nextTetrominoes > div .MinoDiv {
-    border: 1px solid darkslategray;
+    border: 1px solid gray;
 }
 
 .InfoBox {
+    /* height: 94vh; */
+    height: 48vh;
     border-radius: 1rem 0 0 0;
+    border: 1vh solid turquoise;
+    position: relative;
+    left: 1vh;
+    top: -1vh;
+    background-color: turquoise;
+    min-width: 22vh;
 }
+
+.InfoBox > div {
+    background-color: black;
+    height: 6vh;
+    margin-bottom: 2vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.InfoBox p {
+    color: white;
+}
+
+.InfoBox #holdContainer {
+    height: 15vh;
+}
+
+
 
 
 

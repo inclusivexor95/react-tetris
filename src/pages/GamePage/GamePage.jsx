@@ -295,11 +295,12 @@ const GamePage = () => {
     };
 
     const dropFloaters = (arrayClone, highestRowRemoved, numOfLines) => {
+        console.log('dropping floaters starting at row ', (highestRowRemoved + 1), numOfLines, ' lines');
         for (let i = (highestRowRemoved + 1); i < 40; i++) {
             arrayClone[i].forEach((square, index) => {
                 if (square !== 0) {
                     arrayClone[i - numOfLines][index] = square;
-                    square = 0;
+                    arrayClone[i][index] = 0;
                 };
             });
         };
@@ -307,17 +308,23 @@ const GamePage = () => {
     };
 
     const removeLine = (linesToRemove) => {
+        // console.log('removing lines: ', linesToRemove);
         const arrayClone = boardArray.map(row => row.slice());
-        let highestRow;
+        let highestRow = 0;
 
         linesToRemove.forEach((line) => {
             if (line > highestRow) {
                 highestRow = line;
             };
-            arrayClone[line].forEach((lineSquare) => {
-                lineSquare = 0;
+            // console.log(arrayClone[line]);
+            arrayClone[line].forEach((_, index) => {
+                // console.log('removing square ', line, square, ' from ', arrayClone[line]);
+                arrayClone[line][index] = 0;
             });
+            // console.log('removing row ', line);
         });
+
+        // console.log('new board: ', arrayClone)
 
         dropFloaters(arrayClone, highestRow, linesToRemove.length);
 
@@ -347,6 +354,7 @@ const GamePage = () => {
     };
 
     const checkForLine = (tetCoords) => {
+        // console.log('checking for line, coords: ', tetCoords, ' board: ', boardArray);
         const fullLines = [];
 
         tetCoords.forEach((minoCoord) => {
@@ -571,9 +579,11 @@ const GamePage = () => {
 
     return (
         <div className="GamePage Wrapper">
-            <InfoBox level={level} points={points} />
-            <GameBoard startGame={startGame} boardArray={boardArray} />
-            <NextList sevenBag={sevenBag} currentTetromino={currentTetromino} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
+            <div className="GameContainer">
+                <InfoBox level={level} points={points} />
+                <GameBoard startGame={startGame} boardArray={boardArray} />
+                <NextList sevenBag={sevenBag} currentTetromino={currentTetromino} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
+            </div>
         </div>
     );
 };
