@@ -14,6 +14,8 @@ const GamePage = () => {
     const [prevTetCoords, setPrevTetCoords] = useState([]);
     const [rotation, setRotation] = useState(0);
     const [tick, setTick] = useState(0);
+    const [level, setLevel] = useState(0);
+    const [points, setPoints] = useState(0);
     const [boardArray, setBoardArray] = useState([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -239,7 +241,7 @@ const GamePage = () => {
         setBoardArray(arrayClone);
     };
 
-    // creates 
+    // creates the next tetromino in the 21st and 22nd rows
     const createTetromino = () => {
         const tetCoords = [];
         const dummyCoords = [[39, 3], [39, 4], [39, 5], [39, 6]];
@@ -268,6 +270,7 @@ const GamePage = () => {
         };
     };
 
+    // detects if there is something occupying the given coordinates
     const collisionDetection = (newCoords, oldCoords, eventCase = false) => {
         let board;
 
@@ -291,6 +294,74 @@ const GamePage = () => {
         });
     };
 
+    const dropFloaters = (arrayClone, highestRowRemoved, numOfLines) => {
+        for (let i = (highestRowRemoved + 1); i < 40; i++) {
+            arrayClone[i].forEach((square, index) => {
+                if (square !== 0) {
+                    arrayClone[i - numOfLines][index] = square;
+                    square = 0;
+                };
+            });
+        };
+        setBoardArray(arrayClone);
+    };
+
+    const removeLine = (linesToRemove) => {
+        const arrayClone = boardArray.map(row => row.slice());
+        let highestRow;
+
+        linesToRemove.forEach((line) => {
+            if (line > highestRow) {
+                highestRow = line;
+            };
+            arrayClone[line].forEach((lineSquare) => {
+                lineSquare = 0;
+            });
+        });
+
+        dropFloaters(arrayClone, highestRow, linesToRemove.length);
+
+        if (linesToRemove.length === 1) {
+            setPoints(points + (level * 100));
+        }
+        else if (linesToRemove.length === 2) {
+            setPoints(points + (level * 300));
+        }
+        switch(linesToRemove.length) {
+            case 1:
+                setPoints(points + (level * 100));
+                break;
+            case 2:
+                setPoints(points + (level * 300));
+                break;
+            case 3:
+                setPoints(points + (level * 500));
+                break;
+            case 4:
+                setPoints(points + (level * 800));
+                break;
+            default:
+                console.log('scoring error, >4 or <1 lines cleared?');
+                break;
+        };
+    };
+
+    const checkForLine = (tetCoords) => {
+        const fullLines = [];
+
+        tetCoords.forEach((minoCoord) => {
+            if (boardArray[minoCoord[0]].every((rowSquare) => {
+                return rowSquare !== 0;
+            }) && !(fullLines.includes(minoCoord[0]))) {
+                fullLines.push(minoCoord[0]);
+            };
+        });
+
+        if (fullLines.length > 0) {
+            removeLine(fullLines);
+        };
+    };
+
     const gravity = () => {
         const newTetCoords = coordsRef.current.map((minoCoord) => {
             return [minoCoord[0] - 1, minoCoord[1]];
@@ -304,17 +375,21 @@ const GamePage = () => {
             if (tetReady === true) {
                 clearInterval(window.tickInterval);
                 console.log('game over');
-            };
-            if (currentTetromino === 6) {
-                setSevenBag([...nextSeven]);
-                generateBag(false);
-                setCurrentTetromino(0);
             }
             else {
-                setCurrentTetromino(currentTetromino + 1);
-            };
-            setRotation(0);
-            setTetReady(true);
+                checkForLine(currentTetCoords);
+    
+                if (currentTetromino === 6) {
+                    setSevenBag([...nextSeven]);
+                    generateBag(false);
+                    setCurrentTetromino(0);
+                }
+                else {
+                    setCurrentTetromino(currentTetromino + 1);
+                };
+                setRotation(0);
+                setTetReady(true);
+            }
         };
     };
 
@@ -496,7 +571,7 @@ const GamePage = () => {
 
     return (
         <div className="GamePage Wrapper">
-            <InfoBox />
+            <InfoBox level={level} points={points} />
             <GameBoard startGame={startGame} boardArray={boardArray} />
             <NextList sevenBag={sevenBag} currentTetromino={currentTetromino} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
         </div>
