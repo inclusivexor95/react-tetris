@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const InfoBox = ({ points, level }) => {
+const InfoBox = ({ score, level }) => {
     
     return (
         <div className='InfoBox'>
@@ -13,7 +13,7 @@ const InfoBox = ({ points, level }) => {
             </div>
             <h2>SCORE</h2>
             <div id="scoreContainer">
-                <p>{points}</p>
+                <p>{score}</p>
             </div>
             {/* <h2>TIME</h2>
             <div id="timeContainer"></div> */}

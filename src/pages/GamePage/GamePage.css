@@ -6,15 +6,15 @@
 }
 
 .GameContainer {
-    width: 71vh;
+    width: 48vh;
     /* height: 94vh; */
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     /* border: 1vh solid turquoise; */
     background-color: turquoise;
     padding: 1vh 0;
-    border-radius: 0 1rem 0 0;
-    margin-left: 11vh;
+    /* border-radius: 0 1rem 0 0; */
+    /* margin-left: 11vh; */
 }
 
 .GameBoard {
@@ -56,8 +56,8 @@
 
 #startButton:hover {
     cursor: pointer;
-    color: grey;
-    border: 2px solid grey;
+    color: turquoise;
+    border: 2px solid turquoise;
 }
 
 .NextList, .InfoBox {
@@ -67,11 +67,17 @@
     width: 22vh;
     /* background-color: turquoise; */
     margin: 0 1vh;
+    position: relative;
+    border: 1vh solid turquoise;
+    top: -1vh;
+    background-color: turquoise;
+
 }
 
 .NextList {
-    height: 92vh;
+    height: 82vh;
     border-radius: 0 1rem 0 0;
+    right: 1vh;
     min-width: 22vh;
 }
 
@@ -121,11 +127,9 @@
     /* height: 94vh; */
     height: 48vh;
     border-radius: 1rem 0 0 0;
-    border: 1vh solid turquoise;
-    position: relative;
+    
     left: 1vh;
-    top: -1vh;
-    background-color: turquoise;
+    
     min-width: 22vh;
 }
 
@@ -152,6 +156,10 @@
 
 
 
+
+@keyframes lineClear {
+    to {background-color: white;}
+}
 
 .TetrominoI .MinoDiv {
     background-color: cyan;
@@ -208,3 +216,9 @@
 .Value7 {
     background-color: red;
 }
+
+.Value8 {
+    animation-name: lineClear;
+    animation-duration: 100ms;
+}
+

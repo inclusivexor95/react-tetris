@@ -15,7 +15,8 @@ const GamePage = () => {
     const [rotation, setRotation] = useState(0);
     const [tick, setTick] = useState(0);
     const [level, setLevel] = useState(0);
-    const [points, setPoints] = useState(0);
+    const [linesCleared, setLinesCleared] = useState(0);
+    const [score, setScore] = useState(0);
     const [boardArray, setBoardArray] = useState([
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -295,7 +296,6 @@ const GamePage = () => {
     };
 
     const dropFloaters = (arrayClone, highestRowRemoved, numOfLines) => {
-        console.log('dropping floaters starting at row ', (highestRowRemoved + 1), numOfLines, ' lines');
         for (let i = (highestRowRemoved + 1); i < 40; i++) {
             arrayClone[i].forEach((square, index) => {
                 if (square !== 0) {
@@ -305,10 +305,9 @@ const GamePage = () => {
             });
         };
         setBoardArray(arrayClone);
-    };
+    };  
 
     const removeLine = (linesToRemove) => {
-        // console.log('removing lines: ', linesToRemove);
         const arrayClone = boardArray.map(row => row.slice());
         let highestRow = 0;
 
@@ -316,45 +315,49 @@ const GamePage = () => {
             if (line > highestRow) {
                 highestRow = line;
             };
-            // console.log(arrayClone[line]);
             arrayClone[line].forEach((_, index) => {
-                // console.log('removing square ', line, square, ' from ', arrayClone[line]);
-                arrayClone[line][index] = 0;
+                arrayClone[line][index] = 8;
             });
-            // console.log('removing row ', line);
         });
 
-        // console.log('new board: ', arrayClone)
+        setBoardArray(arrayClone);
 
-        dropFloaters(arrayClone, highestRow, linesToRemove.length);
+        setTimeout(() => {
+            linesToRemove.forEach((line) => {
+                arrayClone[line].forEach((_, index) => {
+                    arrayClone[line][index] = 0;
+                });
+            });
 
-        if (linesToRemove.length === 1) {
-            setPoints(points + (level * 100));
-        }
-        else if (linesToRemove.length === 2) {
-            setPoints(points + (level * 300));
-        }
-        switch(linesToRemove.length) {
-            case 1:
-                setPoints(points + (level * 100));
-                break;
-            case 2:
-                setPoints(points + (level * 300));
-                break;
-            case 3:
-                setPoints(points + (level * 500));
-                break;
-            case 4:
-                setPoints(points + (level * 800));
-                break;
-            default:
-                console.log('scoring error, >4 or <1 lines cleared?');
-                break;
-        };
+            dropFloaters(arrayClone, highestRow, linesToRemove.length);
+
+            switch(linesToRemove.length) {
+                case 1:
+                    setScore(score + ((level + 1) * 100));
+                    break;
+                case 2:
+                    setScore(score + ((level + 1) * 300));
+                    break;
+                case 3:
+                    setScore(score + ((level + 1) * 500));
+                    break;
+                case 4:
+                    setScore(score + ((level + 1) * 800));
+                    break;
+                default:
+                    console.log('scoring error, >4 or <1 lines cleared?');
+                    break;
+            };
+
+            const totalLines = linesCleared + linesToRemove.length;
+            setLinesCleared(totalLines);
+            if (totalLines >= ((((level * level) + level) / 2) * 10)) {
+                setLevel(level + 1);
+            };
+        }, 100);
     };
 
     const checkForLine = (tetCoords) => {
-        // console.log('checking for line, coords: ', tetCoords, ' board: ', boardArray);
         const fullLines = [];
 
         tetCoords.forEach((minoCoord) => {
@@ -402,7 +405,6 @@ const GamePage = () => {
     };
 
     const shiftTetromino = (x, y) => {
-        // console.log('shifting');
         const currentCoords = coordsRef.current;
         const newTetCoords = currentCoords.map((minoCoord) => {
             return [minoCoord[0] + y, minoCoord[1] + x];
@@ -424,6 +426,7 @@ const GamePage = () => {
     const softDrop = (startStop) => {
         if (startStop) {
             lockGravityRef.current = true;
+            lockMovementRef.current = true;
             window.softDropInterval = setInterval(() => {
                 shiftTetromino(0, -1);
             }, 50);
@@ -431,7 +434,57 @@ const GamePage = () => {
         else {
             clearInterval(window.softDropInterval);
             lockGravityRef.current = false;
+            lockMovementRef.current = false;
         };
+    };
+
+    const hardDrop = () => {
+        const currentCoords = coordsRef.current;
+        const arrayClone = boardRef.current.map(row => row.slice());
+        let lowestSpace;
+        const flag = [];
+        
+        currentCoords.forEach((minoCoord) => {
+            let numOfLines = 0;
+
+            for(let i = (minoCoord[0] - 1); i >= 0; i--) {
+                if (arrayClone[i][minoCoord[1]] === 0) {
+                    numOfLines++;
+                    if (i === 0 && (!lowestSpace || numOfLines < lowestSpace)) {
+                        lowestSpace = numOfLines;
+                    };
+                }
+                else if (numOfLines === 0) {
+                    flag.push(minoCoord);
+                    break;
+                }
+                else {
+                    if (!lowestSpace || numOfLines < lowestSpace) {
+                        lowestSpace = numOfLines;
+                    };
+                    break;
+                };
+            };
+        });
+
+        flag.forEach((flaggedMino) => {
+            if (!(currentCoords.some((currentMino) => {
+                return (flaggedMino[1] === currentMino[1] && flaggedMino[0] === (currentMino[0] - 1));
+            }))) {
+                return;
+            };
+        });
+
+        const newCoords = currentCoords.map((minoCoord) => {
+            const newMinoCoords = [minoCoord[0] - lowestSpace, minoCoord[1]];
+            console.log(lowestSpace, newMinoCoords);
+            arrayClone[minoCoord[0]][minoCoord[1]] = 0;
+            arrayClone[newMinoCoords[0]][newMinoCoords[1]] = bagRef.current[tetRef.current] + 1;
+            return newMinoCoords;
+        });
+
+        setCurrentTetCoords(newCoords);
+        setBoardArray(arrayClone);
     };
 
     const rotateTet = (direction) => {
@@ -447,8 +500,6 @@ const GamePage = () => {
         };
 
         const rotationData = tetrominoIndex[bagRef.current[tetRef.current]].rotation[rotationIndex];
-
-        // console.log('rotating Tetromino ', bagRef.current[tetRef.current], ' ', direction, ' data: ', rotationData, ' from: ', rotationIndex);
 
         const newCoords = coordsRef.current.map((minoCoord, index) => {
             if (direction === 'cw') {
@@ -502,9 +553,7 @@ const GamePage = () => {
     };
 
     const controllerFunction = (e) => {
-        // console.log('firing', e.type);
         if (!lockMovementRef.current && e.type === 'keydown') {
-            // console.log('firing', e.keyCode, lockMovementRef);
             switch(e.keyCode) {
                 case 37:
                     shiftTetromino(-1, 0);
@@ -529,6 +578,8 @@ const GamePage = () => {
                 case 17:
                     rotateTet('ccw');
                     break;
+                case 32:
+                    hardDrop();
                 default:
                     break;
             };
@@ -580,7 +631,7 @@ const GamePage = () => {
     return (
         <div className="GamePage Wrapper">
             <div className="GameContainer">
-                <InfoBox level={level} points={points} />
+                <InfoBox level={level} score={score} />
                 <GameBoard startGame={startGame} boardArray={boardArray} />
                 <NextList sevenBag={sevenBag} currentTetromino={currentTetromino} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
             </div>
