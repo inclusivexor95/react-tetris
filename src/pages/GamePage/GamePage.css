@@ -38,26 +38,35 @@
     border: 1px solid gray;
 }
 
-#startButton {
+.GameBoard button {
     position: absolute;
     top: 48%;
+    background-color: #e06540;
+    border: 2px solid black;
+}
+
+.GameBoard button p {
+    margin: 0;
+}
+
+#startButton {
     width: 6%;
     height: 6%;
     left: 47%;
-    background-color: #e06540;
-    border: 2px solid black;
     /* font-size: 80%; */
     /* line-height: 1; */
-}
-
-#startButton p {
-    margin: 0;
 }
 
 #startButton:hover {
     cursor: pointer;
     color: turquoise;
     border: 2px solid turquoise;
+}
+
+#pauseButton {
+    width: 7%;
+    height: 6%;
+    left: 46.5%;
 }
 
 .NextList, .InfoBox {

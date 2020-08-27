@@ -9,9 +9,8 @@ const GamePage = () => {
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     const [currentTetromino, setCurrentTetromino] = useState(0);
-    const [tetReady, setTetReady] = useState(false);
     const [currentTetCoords, setCurrentTetCoords] = useState([]);
-    const [prevTetCoords, setPrevTetCoords] = useState([]);
+    const [showPauseButton, setShowPauseButton] = useState(false);
     const [rotation, setRotation] = useState(0);
     const [tick, setTick] = useState(0);
     const [level, setLevel] = useState(0);
@@ -62,7 +61,6 @@ const GamePage = () => {
 
     // refs to different state variables for use within useInterval() controlled functions
     const coordsRef = useRef(currentTetCoords);
-    const prevCoordsRef = useRef(prevTetCoords);
     const boardRef = useRef(boardArray);
     const bagRef = useRef(sevenBag);
     const tetRef = useRef(currentTetromino);
@@ -70,6 +68,11 @@ const GamePage = () => {
 
     const lockMovementRef = useRef(false);
     const lockGravityRef = useRef(false);
+    const gravityInProgressRef = useRef(false);
+    const softDropInProgressRef = useRef(false);
+    const lockDropRef = useRef(false);
+    const tetReadyRef = useRef(false);
+    const pauseRef = useRef(false);
     
     // constant Tetromino data
     const tetrominoIndex = [
@@ -182,7 +185,6 @@ const GamePage = () => {
 
     // generates a random sequence of the seven different Tetrominoes (each one must be included)
     const generateBag = (first = true) => {
-        
         const bag = [];
         
         const randomTetromino = (numLeft = 7) => {
@@ -201,7 +203,8 @@ const GamePage = () => {
                     else {
                         if (first) {
                             setSevenBag(bag);
-                            setTetReady(true);
+                            // setTetReady(true);
+                            tetReadyRef.current = true;
                             generateBag(false);
                         }
                         else {
@@ -220,7 +223,6 @@ const GamePage = () => {
     // updates board in state with new Tetromino coordinates
     const updateTetPos = (newCoords, oldCoords, board, eventCase = false) => {
         let whichNumber;
-        setPrevTetCoords(newCoords);
         if (eventCase) {
             whichNumber = bagRef.current[tetRef.current] + 1;
         }
@@ -262,7 +264,6 @@ const GamePage = () => {
 
         if (!collisionDetection(tetCoords, dummyCoords)) {
             setCurrentTetCoords(tetCoords);
-            setPrevTetCoords(tetCoords);
             updateTetPos(tetCoords, dummyCoords, boardRef.current);
         }
         else {
@@ -383,13 +384,13 @@ const GamePage = () => {
             updateTetPos(newTetCoords, currentTetCoords, boardArray);
         }
         else {
-            if (tetReady === true) {
+            if (tetReadyRef.current === true) {
+                // console.log('collision, new coords: ', newTetCoords, ' old/current coords: ', currentTetCoords);
                 clearInterval(window.tickInterval);
                 console.log('game over');
             }
             else {
                 checkForLine(currentTetCoords);
-    
                 if (currentTetromino === 6) {
                     setSevenBag([...nextSeven]);
                     generateBag(false);
@@ -399,23 +400,30 @@ const GamePage = () => {
                     setCurrentTetromino(currentTetromino + 1);
                 };
                 setRotation(0);
-                setTetReady(true);
-            }
+                // setTetReady(true);
+                tetReadyRef.current = true;
+                // console.log();
+                console.log(tetReadyRef.current);
+            };
         };
     };
 
     const shiftTetromino = (x, y) => {
+        // lockMovementRef.current = true;
         const currentCoords = coordsRef.current;
         const newTetCoords = currentCoords.map((minoCoord) => {
             return [minoCoord[0] + y, minoCoord[1] + x];
         });
 
-        if (!collisionDetection(newTetCoords, currentCoords, true)) {
-            setCurrentTetCoords(newTetCoords);
-            updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
+        if (gravityInProgressRef.current === false && !collisionDetection(newTetCoords, currentCoords, true)) {
+            if (gravityInProgressRef.current === false) {
+                lockGravityRef.current = true;
+                setCurrentTetCoords(newTetCoords);
+                updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
+            };
         }
-        else if (lockGravityRef.current === true && y === -1) {
-            console.log('stopping because of collision');
+        else if (softDropInProgressRef.current === true) {
+            lockDropRef.current = true;
             softDrop(false);
         }
         else {
@@ -425,8 +433,8 @@ const GamePage = () => {
 
     const softDrop = (startStop) => {
         if (startStop) {
+            softDropInProgressRef.current = true;
             lockGravityRef.current = true;
-            lockMovementRef.current = true;
             window.softDropInterval = setInterval(() => {
                 shiftTetromino(0, -1);
             }, 50);
@@ -434,6 +442,7 @@ const GamePage = () => {
         else {
             clearInterval(window.softDropInterval);
             lockGravityRef.current = false;
+            softDropInProgressRef.current = false;
             lockMovementRef.current = false;
         };
     };
@@ -552,48 +561,79 @@ const GamePage = () => {
         };
     };
 
-    const controllerFunction = (e) => {
-        if (!lockMovementRef.current && e.type === 'keydown') {
-            switch(e.keyCode) {
-                case 37:
-                    shiftTetromino(-1, 0);
-                    break;
-                case 39:
-                    shiftTetromino(1, 0);
-                    break;
-                case 40:
-                    if (lockGravityRef.current === false) {
-                        softDrop(true);
-                    };
-                    break;
-                case 38:
-                    rotateTet('cw');
-                    break;
-                case 88:
-                    rotateTet('cw');
-                    break;
-                case 90:
-                    rotateTet('ccw');
-                    break;
-                case 17:
-                    rotateTet('ccw');
-                    break;
-                case 32:
-                    hardDrop();
-                default:
-                    break;
-            };
+    const pauseGame = () => {
+        console.log(pauseRef.current);
+        if (pauseRef.current === false) {
+            clearInterval(window.tickInterval);
+            lockMovementRef.current = true;
+            lockDropRef.current = true;
+            pauseRef.current = true;
+            setShowPauseButton(true);
         }
-        else if (e.type === 'keyup' && e.keyCode === 40) {
-            console.log('stopping because of keyup');
-            softDrop(false);
+        else if (pauseRef.current === true) {
+            setShowPauseButton(false);
+            pauseRef.current = false;
+            lockMovementRef.current = false;
+            lockDropRef.current = false;
+            startGame(true);
         };
     };
 
-    const startGame = () => {
-        generateBag();
-        document.addEventListener('keydown', controllerFunction);
-        document.addEventListener('keyup', controllerFunction);
+    const controllerFunction = (e) => {
+        if (gravityInProgressRef.current === false) {
+            if (lockMovementRef.current === false && e.type === 'keydown') {
+                lockMovementRef.current = true;
+                switch(e.keyCode) {
+                    case 37:
+                        shiftTetromino(-1, 0);
+                        break;
+                    case 39:
+                        shiftTetromino(1, 0);
+                        break;
+                    case 40:
+                        if (lockDropRef.current === false && softDropInProgressRef.current === false) {
+                            softDrop(true);
+                        };
+                        break;
+                    case 38:
+                        rotateTet('cw');
+                        break;
+                    case 88:
+                        rotateTet('cw');
+                        break;
+                    case 90:
+                        rotateTet('ccw');
+                        break;
+                    case 17:
+                        rotateTet('ccw');
+                        break;
+                    case 32:
+                        if (lockDropRef.current === false) {
+                            hardDrop();
+                        };
+                        break;
+                    default:
+                        break;
+                };
+            }
+            else if (e.type === 'keyup' && e.keyCode === 40) {
+                console.log('stopping because of keyup');
+                softDrop(false);
+            };
+        };
+        if (e.type === 'keydown' && (e.keyCode === 27 || e.keyCode === 112)) {
+            console.log('herro');
+            pauseGame();
+        };
+    };
+
+    const startGame = (unpause = false) => {
+        console.log(unpause);
+        if (unpause === false) {
+            generateBag();
+            document.addEventListener('keydown', controllerFunction);
+            document.addEventListener('keyup', controllerFunction);
+        };
         window.tickInterval = setInterval(() => {
             setTick(prevTick => prevTick + 1);
         }, 1000);
@@ -601,14 +641,12 @@ const GamePage = () => {
 
     useEffect(() => {
         if (currentTetCoords.length > 0) {
-            lockMovementRef.current = true;
             bagRef.current = sevenBag;
-
-            if (!lockGravityRef.current) {
+            console.log('gravity locked? ', lockGravityRef.current);
+            if (lockGravityRef.current === false) {
+                lockMovementRef.current = true;
+                gravityInProgressRef.current = true;
                 gravity();
-            };
-            if (tetReady === true) {
-                setTetReady(false);
             };
         };
     }, [tick]);
@@ -617,27 +655,32 @@ const GamePage = () => {
         rotationRef.current = rotation;
         tetRef.current = currentTetromino;
         coordsRef.current = currentTetCoords;
-        prevCoordsRef.current = prevTetCoords;
         boardRef.current = boardArray;
-        lockMovementRef.current = false;
+        gravityInProgressRef.current = false;
+        lockDropRef.current = false;
+        tetReadyRef.current = false;
+        if (softDropInProgressRef.current === false) {
+            lockMovementRef.current = false;
+            lockGravityRef.current = false;
+        };
     }, [JSON.stringify(boardArray)]);
 
     useEffect(() => {
-        if (tetReady === true) {
+        if (tetReadyRef.current === true) {
             createTetromino();
         };
-    }, [tetReady]);
+    }, [tetReadyRef.current]);
 
     return (
         <div className="GamePage Wrapper">
             <div className="GameContainer">
                 <InfoBox level={level} score={score} />
-                <GameBoard startGame={startGame} boardArray={boardArray} />
+                <GameBoard startGame={startGame} boardArray={boardArray} showPauseButton={showPauseButton} />
                 <NextList sevenBag={sevenBag} currentTetromino={currentTetromino} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
             </div>
         </div>
     );
-};
+}
 
 
 export default GamePage;

@@ -1,7 +1,7 @@
 import React from 'react';
 
 
-const GameBoard = ({ startGame, boardArray }) => {
+const GameBoard = ({ startGame, boardArray, showPauseButton }) => {
 
     const handleStartClick = () => {
         const startButton = document.getElementById('startButton');
@@ -412,6 +412,7 @@ const GameBoard = ({ startGame, boardArray }) => {
             <div className='BoardSquare'></div>
             <div className='BoardSquare'></div>
             <button id="startButton" onClick={handleStartClick}><p>START</p></button>
+            {showPauseButton ? <button id="pauseButton"><p>PAUSED</p></button> : null}
         </div>
     );
 }
