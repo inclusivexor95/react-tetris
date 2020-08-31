@@ -7,22 +7,15 @@
 
 .GameContainer {
     width: 48vh;
-    /* height: 94vh; */
     display: flex;
     justify-content: center;
-    /* border: 1vh solid turquoise; */
     background-color: turquoise;
     padding: 1vh 0;
-    /* border-radius: 0 1rem 0 0; */
-    /* margin-left: 11vh; */
 }
 
 .GameBoard {
     background-color: black;
-    /* border: 1rem solid turquoise; */
-    /* box-sizing: content-box; */
     height: 92vh;
-    /* height: 100%; */
     min-width: 46vh;
     display: flex;
     flex-wrap: wrap-reverse;
@@ -46,6 +39,7 @@
 }
 
 .GameBoard button p {
+    font-size: calc(0.8rem + 0.4vw);
     margin: 0;
 }
 
@@ -53,8 +47,6 @@
     width: 6%;
     height: 6%;
     left: 47%;
-    /* font-size: 80%; */
-    /* line-height: 1; */
 }
 
 #startButton:hover {
@@ -70,11 +62,7 @@
 }
 
 .NextList, .InfoBox {
-    /* border: 1rem solid turquoise; */
-    /* border: 1rem solid white; */
-    /* height: 92vh; */
     width: 22vh;
-    /* background-color: turquoise; */
     margin: 0 1vh;
     position: relative;
     border: 1vh solid turquoise;
@@ -95,13 +83,12 @@
     margin: 0;
     padding: calc(2.5vh - 0.8625rem);
     color: black;
-    /* background-color: turquoise; */
     border-radius: 0 1rem 0 0;
+    font-size: calc(1rem + 0.5vw);
 }
 
 #nextTetrominoes {
     height: calc(100% - 5vh);
-    /* height: 87vh; */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -112,16 +99,9 @@
     height: calc(87vh / (21 / 2));
     width: calc(87vh / (21 / 4));
     margin: calc(87vh / 42) 0;
-    /* border: 1px solid white; */
     display: flex;
     flex-wrap: wrap;
 }
-
-/* #nextTetrominoes > div:first-child {
-    height: calc(87vh / (10.5 / 2));
-    width: calc(87vh / (10.5 / 4));
-    margin: calc(87vh / 21) 0;
-} */
 
 #nextTetrominoes > div > div {
     width: 25%;

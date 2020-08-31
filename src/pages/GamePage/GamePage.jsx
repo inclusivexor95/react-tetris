@@ -76,7 +76,7 @@ const GamePage = () => {
     const tetReadyRef = useRef(false);
     const pauseRef = useRef(false);
     const tickStoppedRef = useRef(false);
-    // const creatingTetRef = useRef(false);
+    const holdMoveRef = useRef('');
     
     // constant Tetromino data
     const tetrominoIndex = [
@@ -632,6 +632,11 @@ const GamePage = () => {
         };
     };
 
+    // const holdMove = (e) => {
+    //     holdMoveRef.current = e;
+
+    // }
+
     const controllerFunction = (e) => {
         if (gravityInProgressRef.current === false) {
             if (lockMovementRef.current === false && e.type === 'keydown') {
@@ -672,10 +677,15 @@ const GamePage = () => {
             else if (e.type === 'keyup' && e.keyCode === 40) {
                 console.log('stopping because of keyup');
                 softDrop(false);
+            }
+            else {
+                holdMoveRef.current = e;
             };
+        }
+        else {
+            holdMoveRef.current = e;
         };
         if (e.type === 'keydown' && (e.keyCode === 27 || e.keyCode === 112)) {
-            console.log('herro');
             pauseGame();
         };
     };
@@ -724,13 +734,21 @@ const GamePage = () => {
         };
     }, [tetReadyRef.current]);
 
-    useEffect(() => {
-        console.log('movement locked? ', lockMovementRef.current);
-    }, [lockMovementRef.current]);
+    // useEffect(() => {
+    //     console.log('movement locked? ', lockMovementRef.current);
+    // }, [lockMovementRef.current]);
+
+    // useEffect(() => {
+    //     console.log('drop locked? ', lockDropRef.current);
+    // }, [lockDropRef.current]);
 
     useEffect(() => {
-        console.log('drop locked? ', lockDropRef.current);
-    }, [lockDropRef.current]);
+        // console.log('drop locked? ', lockDropRef.current);
+        if (typeof holdMoveRef.current === 'object') {
+            controllerFunction(holdMoveRef.current);
+            holdMoveRef.current = '';
+        };
+    }, [holdMoveRef.current]);
 
     return (
         <div className="GamePage Wrapper">
