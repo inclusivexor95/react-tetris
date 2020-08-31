@@ -31,12 +31,12 @@
     border: 1px solid gray;
 }
 
-.GameBoard button {
+/* .GameBoard button {
     position: absolute;
     top: 48%;
     background-color: #e06540;
     border: 2px solid black;
-}
+} */
 
 .GameBoard button p {
     font-size: calc(0.8rem + 0.4vw);
@@ -133,10 +133,49 @@
 
 .InfoBox p {
     color: white;
+    font-size: calc(0.8rem + 0.4vw);
 }
 
 .InfoBox #holdContainer {
     height: 15vh;
+}
+
+#gameOverContainer {
+    position: absolute;
+    height: 25%;
+    width: 48vh;
+    background-color: black;
+    border: 1vh solid #e06540;
+    top: 40%;
+    display: flex;
+    justify-content: center;
+    /* text-align: center; */
+}
+
+#gameOverContainer h2 {
+    color: turquoise;
+    word-spacing: 500%;
+}
+
+#gameOverContainer button {
+    height: 30%;
+    width: 40%;
+    background-color: turquoise;
+}
+
+#gameOverContainer button:hover {
+    /* border: 2px solid #e06540; */
+    background-color: #e06540;
+    cursor: pointer;
+} 
+
+#gameOverContainer button p {
+    font-size: calc(0.6rem + 0.3vw);
+}
+
+#gameOverContainer button:hover p {
+    /* color: #e06540; */
+    color: turquoise;
 }
 
 

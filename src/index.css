@@ -20,6 +20,6 @@ html { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: 
     src: local('SquadaOne'), url(./fonts/SquadaOne-Regular.ttf) format('truetype');
 }
 
-h2, p {
+h2, p, a {
     font-family: 'Michroma';
 }

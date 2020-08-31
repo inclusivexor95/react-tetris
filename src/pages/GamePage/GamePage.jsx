@@ -9,6 +9,7 @@ const GamePage = () => {
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     // const [currentTetromino, setCurrentTetromino] = useState(0);
+    const [showGameOver, setShowGameOver] = useState(true);
     const [currentTetCoords, setCurrentTetCoords] = useState([]);
     const [showPauseButton, setShowPauseButton] = useState(false);
     const [rotation, setRotation] = useState(0);
@@ -16,7 +17,7 @@ const GamePage = () => {
     const [level, setLevel] = useState(0);
     const [linesCleared, setLinesCleared] = useState(0);
     const [score, setScore] = useState(0);
-    const [boardArray, setBoardArray] = useState([
+    const emptyBoard = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -57,14 +58,14 @@ const GamePage = () => {
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]);
+    ];
+    const [boardArray, setBoardArray] = useState(emptyBoard);
 
     // refs to different state variables for use within useInterval() controlled functions
     const coordsRef = useRef(currentTetCoords);
     const boardRef = useRef(boardArray);
     const bagRef = useRef(sevenBag);
     const nextBagRef = useRef(nextSeven);
-    // const tetRef = useRef(currentTetromino);
     const rotationRef = useRef(rotation);
 
     const tetRef = useRef(0);
@@ -252,7 +253,7 @@ const GamePage = () => {
         const tetCoords = [];
         const dummyCoords = [[39, 3], [39, 4], [39, 5], [39, 6]];
 
-        console.log(sevenBag, bagRef.current);
+        // console.log(sevenBag, bagRef.current);
 
         tetrominoIndex[sevenBag[tetRef.current]].shape.forEach((cell, index) => {
             if (index < 4) {
@@ -273,7 +274,8 @@ const GamePage = () => {
         }
         else {
             clearInterval(window.tickInterval);
-            console.log('game over');
+            setShowGameOver(true);
+            // const playAgain = document.getElementById('playAgainButton');
         };
     };
 
@@ -288,11 +290,11 @@ const GamePage = () => {
             board = boardArray;
         };
 
-        newCoords.forEach((minoCoord) => {
-            if (minoCoord[0] >= 0) {
-                console.log(board[minoCoord[0]][minoCoord[1]]);
-            }
-        });
+        // newCoords.forEach((minoCoord) => {
+        //     if (minoCoord[0] >= 0) {
+        //         console.log(board[minoCoord[0]][minoCoord[1]]);
+        //     }
+        // });
 
         // returns only brand new coordinates (to avoid false positives with old position)
         const brandNewCoords = newCoords.filter((newMinoCoord) => {
@@ -390,10 +392,10 @@ const GamePage = () => {
             return [minoCoord[0] - 1, minoCoord[1]];
         });
 
-        console.log('1. checking gravity, newcoords: ', newTetCoords, ' oldcoords: ', currentTetCoords, coordsRef.current, ' current tet: ', tetRef.current);
+        // console.log('1. checking gravity, newcoords: ', newTetCoords, ' oldcoords: ', currentTetCoords, coordsRef.current, ' current tet: ', tetRef.current);
 
         if (collisionDetection(newTetCoords, coordsRef.current, true)) {
-            console.log('2. downward collision');
+            // console.log('2. downward collision');
             lockGravityRef.current = true;
             lockDropRef.current = true;
             if (tickStoppedRef.current === false) {
@@ -403,24 +405,24 @@ const GamePage = () => {
                 window.lockDelay = setTimeout(() => {
                     if (tickStoppedRef.current === true) {
                         tickStoppedRef.current = false;
-                        console.log('gravity collision 1');
+                        // console.log('gravity collision 1');
                         gravityCollision(1);
                         startGame(true);
                     };
                 }, 500);
-            }
-            else {
-                clearTimeout(window.lockDelay);
-                console.log('starting timeout');
-                window.lockDelay = setTimeout(() => {
-                    if (tickStoppedRef.current === true) {
-                        tickStoppedRef.current = false;
-                        console.log('gravity collision 2');
-                        gravityCollision(2);
-                        startGame(true);
-                    };
-                }, 500);
             };
+            // else {
+            //     clearTimeout(window.lockDelay);
+            //     console.log('starting timeout');
+            //     window.lockDelay = setTimeout(() => {
+            //         if (tickStoppedRef.current === true) {
+            //             tickStoppedRef.current = false;
+            //             console.log('gravity collision 2');
+            //             gravityCollision(2);
+            //             startGame(true);
+            //         };
+            //     }, 500);
+            // };
         }
         else if (tickStoppedRef.current === true) {
             tickStoppedRef.current = false;
@@ -450,7 +452,7 @@ const GamePage = () => {
         });
         
         
-        console.log(newTetCoords, ' lockgraavityref: ', lockGravityRef.current);
+        // console.log(newTetCoords, ' lockgraavityref: ', lockGravityRef.current);
 
         setCurrentTetCoords(newTetCoords);
         updateTetPos(newTetCoords, currentTetCoords, boardArray);
@@ -690,8 +692,37 @@ const GamePage = () => {
         };
     };
 
+    const playAgain = () => {
+        setLevel(0);
+        setScore(0);
+        setTick(0);
+        setLinesCleared(0);
+        setBoardArray(emptyBoard);
+
+        // boardRef.current = boardArray;
+        // bagRef.current = sevenBag;
+        // nextBagRef.current = nextSeven;
+        // rotationRef.current = rotation;
+
+        tetRef.current = 0;
+        lockMovementRef.current = false;
+        lockGravityRef.current = false;
+        gravityInProgressRef.current = false;
+        softDropInProgressRef.current = false;
+        lockDropRef.current = false;
+        tetReadyRef.current = false;
+        pauseRef.current = false;
+        tickStoppedRef.current = false;
+        holdMoveRef.current = '';
+
+        setShowGameOver(false);
+        startGame();
+    };
+
     const startGame = (unpause = false) => {
         if (unpause === false) {
+            const startButton = document.getElementById('startButton');
+            startButton.style.display = 'none';
             generateBag();
             document.addEventListener('keydown', controllerFunction);
             document.addEventListener('keyup', controllerFunction);
@@ -710,10 +741,12 @@ const GamePage = () => {
                 gravityInProgressRef.current = true;
                 gravity();
             };
+            console.log('tick', tick)
         };
     }, [tick]);
 
     useEffect(() => {
+        clearTimeout(window.lockDelay);
         rotationRef.current = rotation;
         coordsRef.current = currentTetCoords;
         boardRef.current = boardArray;
@@ -728,7 +761,7 @@ const GamePage = () => {
     }, [JSON.stringify(boardArray)]);
 
     useEffect(() => {
-        console.log('tetready change');
+        // console.log('tetready change');
         if (tetReadyRef.current === true) {
             createTetromino();
         };
@@ -756,6 +789,7 @@ const GamePage = () => {
                 <InfoBox level={level} score={score} />
                 <GameBoard startGame={startGame} boardArray={boardArray} showPauseButton={showPauseButton} />
                 <NextList sevenBag={sevenBag} currentTetromino={tetRef.current} nextSeven={nextSeven} tetrominoIndex={tetrominoIndex} />
+                {showGameOver ? <div id="gameOverContainer"><h2>GAME OVER</h2><button onClick={playAgain} id="playAgainButton"><p>PLAY AGAIN</p></button></div> : null}
             </div>
         </div>
     );

@@ -13,3 +13,23 @@
     left: calc(50% - 14.39vh);
     z-index: -10;
 }
+
+#playButton {
+    width: 10%;
+    height: 10%;
+}
+
+#playButton:hover {
+    cursor: pointer;
+    border: 2px solid turquoise;
+}
+
+#playButton a {
+    text-decoration: none;
+    color: black;
+    font-size: calc(1rem + 0.5vw);
+}
+
+#playButton:hover a {
+    color: turquoise;
+}

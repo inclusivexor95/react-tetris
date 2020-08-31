@@ -4,8 +4,6 @@ import React from 'react';
 const GameBoard = ({ startGame, boardArray, showPauseButton }) => {
 
     const handleStartClick = () => {
-        const startButton = document.getElementById('startButton');
-        startButton.style.display = 'none';
         startGame();
     };
 

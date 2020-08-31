@@ -12,3 +12,10 @@
     max-width: 1300px;
     margin: 0 auto;
 }
+
+button {
+    position: absolute;
+    top: 48%;
+    background-color: #e06540;
+    border: 2px solid black;
+}
