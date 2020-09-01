@@ -103,12 +103,12 @@
     flex-wrap: wrap;
 }
 
-#nextTetrominoes > div > div {
+#nextTetrominoes > div > div, #holdContainer > div > div {
     width: 25%;
     height: 50%;
 }
 
-#nextTetrominoes > div .MinoDiv {
+.GamePage .MinoDiv {
     border: 1px solid gray;
 }
 
@@ -138,6 +138,14 @@
 
 .InfoBox #holdContainer {
     height: 15vh;
+    
+}
+
+#holdContainer > div {
+    width: 17vh;
+    height: 8.5vh;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 #gameOverContainer {

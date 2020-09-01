@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
 
 
-const NextList = ({ sevenBag, tetrominoIndex, nextSeven, currentTetromino }) => {
+const NextList = ({ sevenBag, nextSeven, currentTetromino, generateTetrominoHTML }) => {
 
     const [tetrominoHTML, setTetrominoHTML] = useState({
         stateHTML: []
     });
-
-    const generateTetrominoHTML = (tetrominoId) => {
-        return (
-            <div className={'Tetromino' + tetrominoIndex[tetrominoId].name}>
-                {tetrominoIndex[tetrominoId].shape.map((cell) => {
-                    return <div className={cell ? 'MinoDiv' : 'TransparentDiv'}></div>;
-                })}
-            </div>
-        ); 
-    };
 
     const displayTetrominoes = () => {
 
