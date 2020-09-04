@@ -12,14 +12,14 @@ html { -moz-box-sizing: border-box; -webkit-box-sizing: border-box; box-sizing: 
 
 @font-face {
     font-family: 'Michroma';
-    src: local('Michroma'), url(./fonts/Michroma-Regular.ttf) format('truetype');
+    src: local('Michroma'), url(/assets/fonts/Michroma-Regular.ttf) format('truetype');
 }
 
 @font-face {
     font-family: 'SquadaOne';
-    src: local('SquadaOne'), url(./fonts/SquadaOne-Regular.ttf) format('truetype');
+    src: local('SquadaOne'), url(/assets/fonts/SquadaOne-Regular.ttf) format('truetype');
 }
 
-h2, p, a {
+h2, h3, p, a {
     font-family: 'Michroma';
 }

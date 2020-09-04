@@ -31,7 +31,7 @@ const LoginPage = ({ handleSignupOrLogin, history }) => {
     };
 
     return (
-        <div className="LoginPage">
+        <div className="LoginPage Wrapper">
             <h1>Login Page</h1>
             <form onSubmit={handleSubmit}>
                 <div className="EmailContainer">

@@ -1,9 +1,16 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
+const User = require('../../models/User');
+const usersCtrl = require('../../controllers/api/users');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+/*---------- Public Routes ----------*/
+router.post('/signup', usersCtrl.signup);
+router.post('/login', usersCtrl.login);
+
+
+/*---------- Protected Routes ----------*/
+
+
+
 
 module.exports = router;

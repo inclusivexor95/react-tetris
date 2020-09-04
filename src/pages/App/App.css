@@ -1,10 +1,16 @@
 .App {
-    background-image: url(/assets/landscape.jpg);
+    background-image: linear-gradient(rgba(100, 100, 100, 0.3), rgba(100, 100, 100, 0.3)), url(/assets/images/landscape.jpg);
+    background-size: cover;
     text-align: center;
     padding: 2vh 0 0 0;
     z-index: -20;
     position: absolute;
     width: 100%;
+}
+
+.App > div {
+    height: 98vh;
+    padding: 2vh 0;
 }
 
 .Wrapper {
@@ -13,9 +19,41 @@
     margin: 0 auto;
 }
 
+.NavBar {
+    position: absolute;
+    /* width: 160vh; */
+    width: 80%;
+    max-width: 1300px;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4vh;
+}
+
+.NavBar > div {
+    width: 60vh;
+    display: flex;
+}
+
+.NavBar #loginNav {
+    justify-content: flex-end;
+}
+
+.NavBar h3, .NavBar a {
+    color: black;
+    text-decoration: none;
+    /* font-family: 'SquadaOne'; */
+    font-size: calc(1rem + 0.5vw);
+    word-spacing: 150%;
+    margin: 0;
+}
+
+.NavBar h3:hover {
+    cursor: pointer;
+} 
+
 button {
     position: absolute;
     top: 48%;
     background-color: #e06540;
-    border: 2px solid black;
+    border: 2px solid transparent;
 }

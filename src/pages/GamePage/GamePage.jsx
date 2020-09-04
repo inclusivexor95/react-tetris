@@ -3,9 +3,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import GameBoard from '../../components/GameBoard/GameBoard';
 import NextList from '../../components/NextList/NextList';
 import InfoBox from '../../components/InfoBox/InfoBox';
+import NavBar from '../../components/NavBar/NavBar';
 
 
-const GamePage = () => {
+const GamePage = ({ user, handleLogout }) => {
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     const [showGameOver, setShowGameOver] = useState(false);
@@ -839,6 +840,7 @@ const GamePage = () => {
     return (
         <div className="GamePage Wrapper">
             <div className="GameContainer">
+                <NavBar user={user} handleLogout={handleLogout} />
                 <InfoBox level={level} score={score} heldPiece={heldPiece} generateTetrominoHTML={generateTetrominoHTML} />
                 <GameBoard startGame={startGame} boardArray={boardArray} showPauseButton={showPauseButton} />
                 <NextList sevenBag={sevenBag} currentTetromino={tetRef.current} nextSeven={nextSeven} generateTetrominoHTML={generateTetrominoHTML} />

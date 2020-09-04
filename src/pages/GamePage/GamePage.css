@@ -1,6 +1,4 @@
 .GamePage {
-    height: 98vh;
-    padding: 2vh 0;
     display: flex;
     justify-content: center;
 }

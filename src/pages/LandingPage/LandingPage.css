@@ -1,10 +1,8 @@
-.LandingPage {
-    height: 98vh;
+/* .LandingPage {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 12vh 0 0 0;
-}
+} */
 
 .LandingPage > img {
     height: 20vh;
@@ -15,8 +13,17 @@
 }
 
 #playButton {
+    text-decoration: none;
     width: 10%;
     height: 10%;
+    background-color: #e06540;
+    border: 2px solid transparent;
+    position: absolute;
+    top: 50%;
+    left: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #playButton:hover {
@@ -24,12 +31,12 @@
     border: 2px solid turquoise;
 }
 
-#playButton a {
-    text-decoration: none;
+#playButton p {
     color: black;
     font-size: calc(1rem + 0.5vw);
+    margin: 0;
 }
 
-#playButton:hover a {
+#playButton:hover p {
     color: turquoise;
 }

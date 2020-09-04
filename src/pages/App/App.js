@@ -15,7 +15,7 @@ function App() {
         setUser(null);
     };
 
-    handleSignupOrLogin = () => {
+    const handleSignupOrLogin = () => {
         setUser(userService.getUser());
     };
 

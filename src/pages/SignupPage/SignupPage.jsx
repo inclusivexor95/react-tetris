@@ -15,7 +15,7 @@ const SignupPage = ({ history, handleSignupOrLogin }) => {
 
     const handleChange = (e) => {
         const newField = {[e.target.name]: e.target.value};
-        const newData = {...loginInfo, ...newField};
+        const newData = {...signupInfo, ...newField};
 
         setSignupInfo(newData);
         setErrMessage('');
@@ -28,12 +28,12 @@ const SignupPage = ({ history, handleSignupOrLogin }) => {
             handleSignupOrLogin();
             history.push('/');
         } catch (err) {
-            setMessage(err.message);
+            setErrMessage(err.message);
         };
     };
 
     return (
-        <div className="SignupPage">
+        <div className="SignupPage Wrapper">
             <h1>Sign Up</h1>
             <form onSubmit={handleSubmit}>
                 <div className="nameContainer">
