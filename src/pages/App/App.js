@@ -4,6 +4,7 @@ import GamePage from '../GamePage/GamePage';
 import LandingPage from '../LandingPage/LandingPage';
 import LoginPage from '../LoginPage/LoginPage';
 import SignupPage from '../SignupPage/SignupPage';
+import ScorePage from '../ScorePage/ScorePage';
 import userService from '../../utils/userService';
 import './App.css';
 
@@ -44,6 +45,12 @@ function App() {
                 <SignupPage
                 history={history}
                 handleSignupOrLogin={handleSignupOrLogin}
+                />
+            }/>
+            <Route exact path='/scores' render={() => 
+                <ScorePage
+                user={user}
+                handleLogout={handleLogout}
                 />
             }/>
             </Switch>

@@ -1,9 +1,11 @@
 import './GamePage.css';
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import GameBoard from '../../components/GameBoard/GameBoard';
 import NextList from '../../components/NextList/NextList';
 import InfoBox from '../../components/InfoBox/InfoBox';
 import NavBar from '../../components/NavBar/NavBar';
+import scoreService from '../../utils/scoreService';
 
 
 const GamePage = ({ user, handleLogout }) => {
@@ -213,6 +215,20 @@ const GamePage = ({ user, handleLogout }) => {
         ); 
     };
 
+    const logHighScore = async () => {
+        console.log(score);
+        try {
+            await scoreService.logScore({
+                score: score,
+                level: level,
+                linesCleared: linesCleared
+            });
+        }
+        catch(err) {
+            console.log(err.message);
+        };
+    };
+
     // generates a random sequence of the seven different Tetrominoes (each one must be included)
     const generateBag = (first = true) => {
         const bag = [];
@@ -297,6 +313,7 @@ const GamePage = ({ user, handleLogout }) => {
         }
         else {
             clearInterval(window.tickInterval);
+            logHighScore();
             setShowGameOver(true);
         };
     };
@@ -839,12 +856,12 @@ const GamePage = ({ user, handleLogout }) => {
 
     return (
         <div className="GamePage Wrapper">
+            <NavBar user={user} handleLogout={handleLogout} />
             <div className="GameContainer">
-                <NavBar user={user} handleLogout={handleLogout} />
                 <InfoBox level={level} score={score} heldPiece={heldPiece} generateTetrominoHTML={generateTetrominoHTML} />
                 <GameBoard startGame={startGame} boardArray={boardArray} showPauseButton={showPauseButton} />
                 <NextList sevenBag={sevenBag} currentTetromino={tetRef.current} nextSeven={nextSeven} generateTetrominoHTML={generateTetrominoHTML} />
-                {showGameOver ? <div id="gameOverContainer"><h2>GAME OVER</h2><button onClick={playAgain} id="playAgainButton"><p>PLAY AGAIN</p></button></div> : null}
+                {showGameOver ? <div id="gameOverContainer"><h2>GAME OVER</h2><button onClick={playAgain} id="playAgainButton"><p>PLAY AGAIN</p></button><Link to='/scores' id="seeScoresButton">See High Scores</Link></div> : null}
             </div>
         </div>
     );

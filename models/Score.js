@@ -15,7 +15,8 @@ const scoreSchema = new Schema(
         linesCleared: {
             type: Number,
             required: true
-        }
+        },
+        userName: String
     }
 );
 

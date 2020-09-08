@@ -154,6 +154,7 @@
     border: 1vh solid #e06540;
     top: 40%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     /* text-align: center; */
 }
@@ -161,12 +162,15 @@
 #gameOverContainer h2 {
     color: turquoise;
     word-spacing: 500%;
+    /* height: 10%; */
+    width: 100%;
 }
 
 #gameOverContainer button {
     height: 30%;
     width: 40%;
     background-color: turquoise;
+    position: static;
 }
 
 #gameOverContainer button:hover {
@@ -181,6 +185,11 @@
 
 #gameOverContainer button:hover p {
     /* color: #e06540; */
+    color: turquoise;
+}
+
+#gameOverContainer a {
+    width: 100%;
     color: turquoise;
 }
 

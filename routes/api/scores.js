@@ -4,6 +4,7 @@ const scoresCtrl = require('../../controllers/api/scores');
 
 
 router.get('/', scoresCtrl.index);
+router.post('/', scoresCtrl.logScore);
 
 
 

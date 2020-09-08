@@ -12,22 +12,19 @@ const port = process.env.PORT || 3001;
 
 // const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/api/users');
+const scoresRouter = require('./routes/api/scores');
 
 const app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
 app.use(logger('dev'));
 app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, 'build', 'favicon.ico')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
 app.use('/api/users', usersRouter);
+app.use(require('./config/auth'));
+app.use('/api/scores', scoresRouter);
 
 app.get('/*', function(req, res) {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
