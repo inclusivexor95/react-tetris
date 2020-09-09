@@ -18,12 +18,14 @@ function index(req, res) {
 
 function logScore(req, res) {
     // console.log('req.body: ', req.body);
-    if (req.user) {
-        Score.create(...req.body, ...{userName: req.user.name})
+    console.log('username: ', req.user.name);
+    if (req.user.name) {
+        console.log('working');
+        Score.create({...req.body, ...{userName: req.user.name}})
         .then(function(score) {
             User.findById(req.user._id)
             .then(function(user) {
-                // console.log('user: ', user, req.user);
+                console.log('user: ', user, req.user);
                 user.scores.push(score._id);
                 user.save(function() {
                     res.status(200).json(score);
@@ -34,7 +36,7 @@ function logScore(req, res) {
         });
     }
     else {
-        Score.create(...req.body, ...{userName: 'Guest'})
+        Score.create({...req.body, ...{userName: 'Guest'}})
         .then(function(score) {
             res.status(200).json(score);
         }).catch(function(err) {

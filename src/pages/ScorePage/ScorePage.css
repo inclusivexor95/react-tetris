@@ -1,0 +1,49 @@
+.ScorePage {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    /* text-align: center; */
+}
+
+.ScorePage h1 {
+    width: 100%;
+    font-family: 'Michroma';
+    margin-top: 3vh;
+    color: white;
+    font-size: calc(3rem + 1.5vh);
+}
+
+#scoreContainer {
+    /* background-color: #e06540; */
+    width: 70vh;
+    /* margin-top: 5vh; */
+    /* border: 1px solid white; */
+    height: 85%;
+    /* display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-between; */
+    
+}
+
+#scoreContainer > div {
+    background-color: rgba(64, 224, 208, 0.7);
+    display: flex;
+    flex-wrap: wrap;
+    /* flex-direction: column; */
+    margin-bottom: 2%;
+    height: 8%;
+    align-items: center;
+}
+
+#scoreContainer > div p.ScoreText {
+    width: 28%;
+    font-size: calc(1.6rem + 0.8vw);
+    margin: 0;
+}
+
+#scoreContainer > div p {
+    width: 21%;
+    font-size: calc(0.6rem + 0.3vw);
+}
