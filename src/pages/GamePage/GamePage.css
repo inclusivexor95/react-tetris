@@ -131,12 +131,11 @@
 
 .InfoBox p {
     color: white;
-    font-size: calc(0.8rem + 0.4vw);
+    font-size: calc(1rem + 0.5vw);
 }
 
 .InfoBox #holdContainer {
     height: 15vh;
-    
 }
 
 #holdContainer > div {

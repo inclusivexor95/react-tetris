@@ -14,7 +14,7 @@
     font-size: calc(3rem + 1.5vh);
 }
 
-#scoreContainer {
+#highScoresContainer {
     /* background-color: #e06540; */
     width: 70vh;
     /* margin-top: 5vh; */
@@ -27,7 +27,7 @@
     
 }
 
-#scoreContainer > div {
+#highScoresContainer > div {
     background-color: rgba(64, 224, 208, 0.7);
     display: flex;
     flex-wrap: wrap;
@@ -37,13 +37,13 @@
     align-items: center;
 }
 
-#scoreContainer > div p.ScoreText {
+#highScoresContainer > div p.ScoreText {
     width: 28%;
     font-size: calc(1.6rem + 0.8vw);
     margin: 0;
 }
 
-#scoreContainer > div p {
+#highScoresContainer > div p {
     width: 21%;
     font-size: calc(0.6rem + 0.3vw);
 }

@@ -9,9 +9,6 @@ const ScorePage = ({ user, handleLogout }) => {
     const [scoreJSON, setScoreJSON] = useState([]);
     const [scoreHTML, setScoreHTML] = useState([]);
 
-    // const sortResult = (result) => {
-    //     result.sort((a, b) => (a.score > b.score) ? 1 : -1);
-    // };
 
     const getHighScores = async () => {
         try {
@@ -51,7 +48,7 @@ const ScorePage = ({ user, handleLogout }) => {
         <div className='ScorePage Wrapper'>
             <NavBar user={user} handleLogout={handleLogout} />
             <h1>High Scores</h1>
-            <div id="scoreContainer">
+            <div id="highScoresContainer">
                 {scoreHTML}
             </div>
         </div>

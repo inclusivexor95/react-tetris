@@ -7,7 +7,7 @@
 .LandingPage > img {
     height: 20vh;
     position: absolute;
-    top: 2vh;
+    top: 6vh;
     left: calc(50% - 14.39vh);
     z-index: -10;
 }

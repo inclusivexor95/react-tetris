@@ -1,5 +1,7 @@
 .App {
-    background-image: linear-gradient(rgba(100, 100, 100, 0.3), rgba(100, 100, 100, 0.3)), url(/assets/images/landscape.jpg);
+    /* background-image: linear-gradient(rgba(100, 100, 100, 0.3), rgba(100, 100, 100, 0.3)), url(/assets/images/landscape.jpg); */
+    /* background-image: linear-gradient(rgba(100, 100, 100, 0.1), rgba(100, 100, 100, 0.1)), url(/assets/images/underwater.jpeg); */
+    background-image: url(/assets/images/underwater.jpeg);
     background-size: cover;
     text-align: center;
     padding: 2vh 0 0 0;
@@ -48,8 +50,9 @@
     margin: 0;
 }
 
-#loginNav h3:hover {
+#loginNav h3:hover, .NavBar a:hover {
     cursor: pointer;
+    color: gray;
 } 
 
 button {

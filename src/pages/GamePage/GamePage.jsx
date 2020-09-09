@@ -71,7 +71,7 @@ const GamePage = ({ user, handleLogout }) => {
     const nextBagRef = useRef(nextSeven);
     const rotationRef = useRef(rotation);
     const heldPieceRef = useRef(heldPiece);
-    const scoreRef = useRef(score);
+    // const scoreRef = useRef(score);
     const linesClearedRef = useRef(linesCleared);
     const levelRef = useRef(level);
 
@@ -205,6 +205,7 @@ const GamePage = ({ user, handleLogout }) => {
         }
     ];
 
+    // generates tetromino HTML for the InfoBox and NextList components
     const generateTetrominoHTML = (tetrominoId) => {
         return (
             <div className={'Tetromino' + tetrominoIndex[tetrominoId].name}>
@@ -215,8 +216,8 @@ const GamePage = ({ user, handleLogout }) => {
         ); 
     };
 
+    // sends score to the node backend upon game-over
     const logHighScore = async () => {
-        console.log(score);
         try {
             await scoreService.logScore({
                 score: score,
@@ -233,6 +234,7 @@ const GamePage = ({ user, handleLogout }) => {
     const generateBag = (first = true) => {
         const bag = [];
         
+        // makes sure all numbers are included once and only once (increments the random number if it is already used, and checks again recursively)
         const randomTetromino = (numLeft = 7) => {
             let randomNum = Math.floor(Math.random() * numLeft);
             
@@ -289,7 +291,7 @@ const GamePage = ({ user, handleLogout }) => {
         setBoardArray(arrayClone);
     };
 
-    // creates the next tetromino in the 21st and 22nd rows
+    // creates the next tetromino in the 20th and 21st rows
     const createTetromino = () => {
         const tetCoords = [];
         const dummyCoords = [[39, 3], [39, 4], [39, 5], [39, 6]];
@@ -307,6 +309,7 @@ const GamePage = ({ user, handleLogout }) => {
             };
         });
 
+        // checks for collision in initial position (game-over if there is)
         if (!collisionDetection(tetCoords, dummyCoords)) {
             setCurrentTetCoords(tetCoords);
             updateTetPos(tetCoords, dummyCoords, boardArray);
@@ -342,6 +345,7 @@ const GamePage = ({ user, handleLogout }) => {
         });
     };
 
+    // drops any 'floating' minos after line(s) are cleared
     const dropFloaters = (arrayClone, highestRowRemoved, numOfLines) => {
         for (let i = (highestRowRemoved + 1); i < 40; i++) {
             arrayClone[i].forEach((square, index) => {
@@ -354,10 +358,12 @@ const GamePage = ({ user, handleLogout }) => {
         setBoardArray(arrayClone);
     };  
 
+    // triggers line clear animation and removes cleared lines, and then adjusts score/level/linesCleared state variables
     const removeLine = (linesToRemove) => {
         const arrayClone = boardRef.current.map(row => row.slice());
         let highestRow = 0;
 
+        // stores highest row removed and triggers line clear animation
         linesToRemove.forEach((line) => {
             if (line > highestRow) {
                 highestRow = line;
@@ -369,6 +375,7 @@ const GamePage = ({ user, handleLogout }) => {
 
         setBoardArray(arrayClone);
 
+        // removes lines after animation duration
         setTimeout(() => {
             linesToRemove.forEach((line) => {
                 arrayClone[line].forEach((_, index) => {
@@ -376,26 +383,48 @@ const GamePage = ({ user, handleLogout }) => {
                 });
             });
 
+            // drops 'floating' minos
             dropFloaters(arrayClone, highestRow, linesToRemove.length);
 
+            // adjusts score state
+            // switch(linesToRemove.length) {
+            //     case 1:
+            //         setScore(scoreRef.current + ((levelRef.current + 1) * 100));
+            //         break;
+            //     case 2:
+            //         setScore(scoreRef.current + ((levelRef.current + 1) * 300));
+            //         break;
+            //     case 3:
+            //         setScore(scoreRef.current + ((levelRef.current + 1) * 500));
+            //         break;
+            //     case 4:
+            //         setScore(scoreRef.current + ((levelRef.current + 1) * 800));
+            //         break;
+            //     default:
+            //         console.log('scoring error, >4 or <1 lines cleared?');
+            //         break;
+            // };
+
+            // adjusts score state
             switch(linesToRemove.length) {
                 case 1:
-                    setScore(scoreRef.current + ((levelRef.current + 1) * 100));
+                    setScore(prevScore => prevScore + ((levelRef.current + 1) * 100));
                     break;
                 case 2:
-                    setScore(scoreRef.current + ((levelRef.current + 1) * 300));
+                    setScore(prevScore => prevScore + ((levelRef.current + 1) * 300));
                     break;
                 case 3:
-                    setScore(scoreRef.current + ((levelRef.current + 1) * 500));
+                    setScore(prevScore => prevScore + ((levelRef.current + 1) * 500));
                     break;
                 case 4:
-                    setScore(scoreRef.current + ((levelRef.current + 1) * 800));
+                    setScore(prevScore => prevScore + ((levelRef.current + 1) * 800));
                     break;
                 default:
                     console.log('scoring error, >4 or <1 lines cleared?');
                     break;
             };
 
+            // adjusts level and lines cleared state
             const totalLines = linesClearedRef.current + linesToRemove.length;
             setLinesCleared(totalLines);
             if (totalLines >= (((((levelRef.current + 1) * (levelRef.current + 1)) + (levelRef.current + 1)) / 2) * 10)) {
@@ -404,8 +433,8 @@ const GamePage = ({ user, handleLogout }) => {
         }, 100);
     };
 
+    // checks for completed lines at given coordinates, and calls line clear function if there are
     const checkForLine = (tetCoords) => {
-        // console.log('checking ', tetCoords, ' for lines');
         const fullLines = [];
 
         tetCoords.forEach((minoCoord) => {
@@ -416,13 +445,12 @@ const GamePage = ({ user, handleLogout }) => {
             };
         });
 
-        // console.log('lines: ', fullLines);
-
         if (fullLines.length > 0) {
             removeLine(fullLines);
         };
     };
 
+    // checks if the space directly below current tetromino is occupied; stops gravity and initiates the 0.5s lock delay if so
     const checkGravity = () => {
         const newTetCoords = coordsRef.current.map((minoCoord) => {
             return [minoCoord[0] - 1, minoCoord[1]];
@@ -431,30 +459,31 @@ const GamePage = ({ user, handleLogout }) => {
         if (collisionDetection(newTetCoords, coordsRef.current, true)) {
             lockGravityRef.current = true;
             lockDropRef.current = true;
-            console.log('timeout should be started? ', !(tickStoppedRef.current));
             if (tickStoppedRef.current === false) {
                 tickStoppedRef.current = true;
                 clearInterval(window.tickInterval);
-                console.log('starting timeout');
                 window.lockDelay = setTimeout(() => {
-                    console.log('tick should be restarted? ', tickStoppedRef.current);
                     if (tickStoppedRef.current === true) {
+                        // if lock delay is not interrupted, piece locks into place and gravity is restarted
                         tickStoppedRef.current = false;
-                        gravityCollision(1);
+                        gravityCollision();
                         startGame(true);
                     };
                 }, 500);
             };
         }
         else if (tickStoppedRef.current === true) {
+            // restarts gravity if piece is moved back to a 'gravity-able' location during lock delay 
             tickStoppedRef.current = false;
             startGame(true);
         }
         else {
+            // makes sure gravity is not locked if there is no collision (probably when soft drop is ended)
             lockGravityRef.current = false;
         };
     };
 
+    // locks piece into place and switches to the next one
     const gravityCollision = () => {
         lockMovementRef.current = true;
         checkForLine(coordsRef.current);
@@ -465,13 +494,14 @@ const GamePage = ({ user, handleLogout }) => {
         }
         else {
             tetRef.current++;
-            console.log('tet + 1');
+            // console.log('tet + 1');
         };
         setRotation(0);
         lockHoldPieceRef.current = false;
         tetReadyRef.current = true;
     };
 
+    // gravity function (shifts tetromino down 1 square)
     const gravity = () => {
         const newTetCoords = coordsRef.current.map((minoCoord) => {
             return [minoCoord[0] - 1, minoCoord[1]];
@@ -481,12 +511,14 @@ const GamePage = ({ user, handleLogout }) => {
         updateTetPos(newTetCoords, currentTetCoords, boardArray);
     };
 
+    // shifts tetromino left, right, or downwards after checking for collision
     const shiftTetromino = (x, y) => {
         const currentCoords = coordsRef.current;
         const newTetCoords = currentCoords.map((minoCoord) => {
             return [minoCoord[0] + y, minoCoord[1] + x];
         });
 
+        // repeated checks for the gravityInProgress ref to allow gravity to take priority over movement as much as possible
         if (gravityInProgressRef.current === false && !collisionDetection(newTetCoords, currentCoords, true)) {
             if (gravityInProgressRef.current === false) {
                 lockGravityRef.current = true;
@@ -495,14 +527,13 @@ const GamePage = ({ user, handleLogout }) => {
             };
         }
         else if (softDropInProgressRef.current === true) {
+            // stops soft drop if collision while soft dropping
             lockDropRef.current = true;
             softDrop(false);
-        }
-        else {
-            console.log('collision');
         };
     };
 
+    // starts/stops soft drop interval depending on Boolean parameter
     const softDrop = (startStop) => {
         if (startStop) {
             // console.log('lock drop', lockDropRef.current)
@@ -510,6 +541,7 @@ const GamePage = ({ user, handleLogout }) => {
             lockGravityRef.current = true;
             window.softDropInterval = setInterval(() => {
                 shiftTetromino(0, -1);
+                setScore(prevScore => prevScore + 1);
             }, 50);
         }
         else {
@@ -523,12 +555,15 @@ const GamePage = ({ user, handleLogout }) => {
         };
     };
 
+    // performs its own collision detection and drops tetromino as far down as possible
     const hardDrop = () => {
         const currentCoords = coordsRef.current;
         const arrayClone = boardRef.current.map(row => row.slice());
         let lowestSpace;
+        let noSpace = false;
         const flag = [];
         
+        // scans downward from each mino until the drop location is found (highest collision) 
         currentCoords.forEach((minoCoord) => {
             let numOfLines = 0;
 
@@ -540,6 +575,7 @@ const GamePage = ({ user, handleLogout }) => {
                     };
                 }
                 else if (numOfLines === 0) {
+                    // flags any columns that have zero space under the mino
                     flag.push(minoCoord);
                     break;
                 }
@@ -552,17 +588,21 @@ const GamePage = ({ user, handleLogout }) => {
             };
         });
 
+        // checks whether there is zero space because of the tetromino itself (does nothing) or because of collision (stops function)
         flag.forEach((flaggedMino) => {
             if (!(currentCoords.some((currentMino) => {
                 return (flaggedMino[1] === currentMino[1] && flaggedMino[0] === (currentMino[0] - 1));
             }))) {
-                return;
+                noSpace = true;
             };
         });
+        if (noSpace === true) {
+            return;
+        };
 
+        // calculates new/dropped coordinates and completes drop
         const newCoords = currentCoords.map((minoCoord) => {
             const newMinoCoords = [minoCoord[0] - lowestSpace, minoCoord[1]];
-            console.log(lowestSpace, newMinoCoords);
             arrayClone[minoCoord[0]][minoCoord[1]] = 0;
             arrayClone[newMinoCoords[0]][newMinoCoords[1]] = bagRef.current[tetRef.current] + 1;
             return newMinoCoords;
@@ -570,12 +610,15 @@ const GamePage = ({ user, handleLogout }) => {
 
         setCurrentTetCoords(newCoords);
         setBoardArray(arrayClone);
+        setScore(prevScore => prevScore + (lowestSpace * 2));
     };
 
+    // rotates current tetromino
     const rotateTet = (direction) => {
         console.log('rotating');
         let rotationIndex = rotationRef.current;
 
+        // adjusts rotation index based on current orientation and rotation direction
         if (direction === 'ccw') {
             if (rotationIndex === 0) {
                 rotationIndex = 3;
@@ -585,8 +628,10 @@ const GamePage = ({ user, handleLogout }) => {
             };
         };
 
+        // retrieves constant rotation vector data based on rotation index and which tetromino is being rotated
         const rotationData = tetrominoIndex[bagRef.current[tetRef.current]].rotation[rotationIndex];
 
+        // applies rotation vectors to find rotated coordinates
         const newCoords = coordsRef.current.map((minoCoord, index) => {
             if (direction === 'cw') {
                 return [minoCoord[0] + rotationData[index][1], minoCoord[1] + rotationData[index][0]];
@@ -596,6 +641,7 @@ const GamePage = ({ user, handleLogout }) => {
             };
         });
 
+        // once again adjusts rotation index
         if (direction === 'cw') {
             if (rotationIndex === 3) {
                 rotationIndex = 0;
@@ -605,6 +651,7 @@ const GamePage = ({ user, handleLogout }) => {
             };
         };
 
+        // completes rotation if no collision, otherwise performs wall kick
         if (!collisionDetection(newCoords, coordsRef.current, true)) {
             setRotation(rotationIndex);
             setCurrentTetCoords(newCoords);
@@ -617,13 +664,11 @@ const GamePage = ({ user, handleLogout }) => {
                 setRotation(rotationIndex);
                 setCurrentTetCoords(wallKickResult);
                 updateTetPos(wallKickResult, coordsRef.current, boardRef.current, true);
-            }
-            else {
-                console.log('rotation collision');
             };
         };
     };
 
+    // calculates best alternative tetromino location if the initial rotated location collides with the wall or other minos 
     const doWallKick = (newCoords, currentCoords, kickString, tetData) => {
         let newNewCoords;
 
@@ -638,6 +683,7 @@ const GamePage = ({ user, handleLogout }) => {
         };
     };
 
+    // pauses/unpauses the game
     const pauseGame = () => {
         if (pauseRef.current === false) {
             clearInterval(window.tickInterval);
@@ -655,6 +701,7 @@ const GamePage = ({ user, handleLogout }) => {
         };
     };
 
+    // transfers current (falling) tetromino to the hold box; a previously held tetromino becomes the new current (falling) tetromino
     const holdPiece = () => {
         lockGravityRef.current = true;
         lockDropRef.current = true;
@@ -662,14 +709,16 @@ const GamePage = ({ user, handleLogout }) => {
         const board = boardRef.current.map(row => row.slice());
         const bag = [...bagRef.current];
 
+        // wipes current tetromino off the board
         coordsRef.current.forEach((minoCoord) => {
             board[minoCoord[0]][minoCoord[1]] = 0;
         });
-
         setBoardArray(board);
 
+        // swaps the two variable values
         const nextHeldPiece = bag.splice(tetRef.current, 1, heldPieceRef.current)[0];
 
+        // switches to next tetromino
         if (heldPieceRef.current === 8) {
             if (tetRef.current === 6) {
                 setSevenBag([...nextBagRef.current]);
@@ -690,6 +739,8 @@ const GamePage = ({ user, handleLogout }) => {
         tetReadyRef.current = true;
     };
 
+    // calls appropriate movement function based on key pressed (called by event listener)
+    // holds last input in memory if another operation is being completed (holdMoveRef)
     const controllerFunction = (e) => {
         if (gravityInProgressRef.current === false) {
             if (lockMovementRef.current === false && e.type === 'keydown') {
@@ -753,6 +804,7 @@ const GamePage = ({ user, handleLogout }) => {
         };
     };
 
+    // clears variables & state and starts a new game 
     const playAgain = () => {
         setLevel(0);
         setScore(0);
@@ -778,30 +830,27 @@ const GamePage = ({ user, handleLogout }) => {
         startGame();
     };
 
+    // starts game (either 'from scratch' or from a pause depending on parameter value)
     const startGame = (unpause = false) => {
         tickStoppedRef.current = false;
-        // lockGravityRef.current = false;
         if (unpause === false) {
             const startButton = document.getElementById('startButton');
             startButton.style.display = 'none';
             generateBag();
             document.addEventListener('keydown', controllerFunction);
             document.addEventListener('keyup', controllerFunction);
-        }
-        else {
-            console.log('restarting tick, tick: ', tick, tickStoppedRef.current);
-        }
+        };
+        // interval for gravity function
         window.tickInterval = setInterval(() => {
             console.log('tick: ', tick);
             setTick(prevTick => prevTick + 1);
-            // console.log((0.8 - (levelRef.current * 0.007)) ** levelRef.current);
         }, ((0.8 - (levelRef.current * 0.007)) ** levelRef.current) * 1000);
     }; 
 
+    // updates some refs and calls gravity function every tick of the interval 
     useEffect(() => {
         if (currentTetCoords.length > 0) {
             linesClearedRef.current = linesCleared;
-            scoreRef.current = score;
             levelRef.current = level;
             bagRef.current = sevenBag;
             nextBagRef.current = nextSeven;
@@ -811,12 +860,11 @@ const GamePage = ({ user, handleLogout }) => {
                 gravityInProgressRef.current = true;
                 gravity();
             };
-            // console.log('tick', tick, ' current tet: ', tetRef.current, ' tickstoppedref: ', tickStoppedRef.current);
         };
     }, [tick]);
 
+    // updates refs and calls the gravity collision check function whenever the board state is changed
     useEffect(() => {
-        // clearTimeout(window.lockDelay);
         rotationRef.current = rotation;
         coordsRef.current = currentTetCoords;
         boardRef.current = boardArray;
@@ -830,29 +878,20 @@ const GamePage = ({ user, handleLogout }) => {
         };
     }, [JSON.stringify(boardArray)]);
 
+    // spawns next tetromino on board when the ref is changed to true
     useEffect(() => {
         if (tetReadyRef.current === true) {
             createTetromino();
         };
     }, [tetReadyRef.current]);
 
-    useEffect(() => {
-        console.log('tickstoppedref: ', tickStoppedRef.current)
-    }, [tickStoppedRef.current]);
-
+    // re-executes user input that was deferred by the controller function 
     useEffect(() => {
         if (typeof holdMoveRef.current === 'object') {
             controllerFunction(holdMoveRef.current);
             holdMoveRef.current = '';
         };
     }, [holdMoveRef.current]);
-
-    // useEffect(() => {
-    //     if (softDropInProgressRef.current === false) {
-    //         console.log('soft drop ending');
-    //         checkGravity();
-    //     }
-    // }, [softDropInProgressRef.current]);
 
     return (
         <div className="GamePage Wrapper">
