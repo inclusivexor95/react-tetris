@@ -205,6 +205,14 @@ const GamePage = ({ user, handleLogout }) => {
         }
     ];
 
+    // const playMusic = () => {
+    // };
+    const audio = new Audio();
+    audio.src = '/assets/music/TetrisTypeA.mp3';
+    audio.loop = true;
+    audio.type = 'audio/mpeg';
+
+
     // generates tetromino HTML for the InfoBox and NextList components
     const generateTetrominoHTML = (tetrominoId) => {
         return (
@@ -316,6 +324,7 @@ const GamePage = ({ user, handleLogout }) => {
         }
         else {
             clearInterval(window.tickInterval);
+            audio.pause();
             logHighScore();
             setShowGameOver(true);
         };
@@ -609,6 +618,13 @@ const GamePage = ({ user, handleLogout }) => {
 
     // rotates current tetromino
     const rotateTet = (direction, event) => {
+        if (bagRef.current[tetRef.current] === 3) {
+            return;
+        }
+        else {
+            lockMovementRef.current = true;
+        };
+
         let rotationIndex = rotationRef.current;
 
         // adjusts rotation index based on current orientation and rotation direction
@@ -692,6 +708,7 @@ const GamePage = ({ user, handleLogout }) => {
     // pauses/unpauses the game
     const pauseGame = () => {
         if (pauseRef.current === false) {
+            audio.pause();
             clearInterval(window.tickInterval);
             lockMovementRef.current = true;
             lockDropRef.current = true;
@@ -699,6 +716,7 @@ const GamePage = ({ user, handleLogout }) => {
             setShowPauseButton(true);
         }
         else if (pauseRef.current === true) {
+            audio.play();
             setShowPauseButton(false);
             pauseRef.current = false;
             lockMovementRef.current = false;
@@ -765,19 +783,15 @@ const GamePage = ({ user, handleLogout }) => {
                         };
                         break;
                     case 38:
-                        lockMovementRef.current = true;
                         rotateTet('cw', e);
                         break;
                     case 88:
-                        lockMovementRef.current = true;
                         rotateTet('cw', e);
                         break;
                     case 90:
-                        lockMovementRef.current = true;
                         rotateTet('ccw', e);
                         break;
                     case 17:
-                        lockMovementRef.current = true;
                         rotateTet('ccw', e);
                         break;
                     case 32:
@@ -850,6 +864,7 @@ const GamePage = ({ user, handleLogout }) => {
     const startGame = (unpause = false) => {
         tickStoppedRef.current = false;
         if (unpause === false) {
+            audio.play();
             const startButton = document.getElementById('startButton');
             startButton.style.display = 'none';
             generateBag();
