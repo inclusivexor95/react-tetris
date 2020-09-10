@@ -8,6 +8,7 @@ module.exports = {
 }
 
 function index(req, res) {
+    console.log('index function');
     Score.find({})
     .then(function(scores) {
         res.status(200).json(scores);
@@ -17,9 +18,7 @@ function index(req, res) {
 }
 
 function logScore(req, res) {
-    // console.log('req.body: ', req.body);
-    console.log('username: ', req.user.name);
-    if (req.user.name) {
+    if (req.userBoolean) {
         console.log('working');
         Score.create({...req.body, ...{userName: req.user.name}})
         .then(function(score) {

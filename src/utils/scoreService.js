@@ -7,17 +7,18 @@ export default {
     logScore
 };
 
-function index() {
+function index(userBoolean) {
     const options = {
         method: 'GET',
         headers: {
         'Authorization': 'Bearer ' + tokenService.getToken()
-        }
+        },
+        userBoolean: userBoolean
     };
     return fetch(BASE_URL, options).then(res => res.json());
 }
 
-function logScore(score) {
+function logScore(score, userBoolean) {
     console.log(score);
     const options = {
         method: 'POST',
@@ -25,6 +26,7 @@ function logScore(score) {
         'Content-type': 'application/json',
         'Authorization': 'Bearer ' + tokenService.getToken()
         },
+        userBoolean: userBoolean,
         body: JSON.stringify(score)
     };
     return fetch(BASE_URL, options).then(res => res.json());

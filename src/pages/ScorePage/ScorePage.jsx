@@ -12,7 +12,7 @@ const ScorePage = ({ user, handleLogout }) => {
 
     const getHighScores = async () => {
         try {
-            const result = await scoreService.index();
+            const result = await scoreService.index(user ? true : false);
             const sortedResult = result.sort((a, b) => (a.score > b.score) ? -1 : (a.score === b.score) ? ((a.linesCleared > b.linesCleared) ? -1 : 1) : 1);
             setScoreJSON(sortedResult);
         }

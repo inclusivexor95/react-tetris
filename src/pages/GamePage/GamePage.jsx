@@ -223,7 +223,7 @@ const GamePage = ({ user, handleLogout }) => {
                 score: score,
                 level: level,
                 linesCleared: linesCleared
-            });
+            }, user ? true : false);
         }
         catch(err) {
             console.log(err.message);
