@@ -387,25 +387,6 @@ const GamePage = ({ user, handleLogout }) => {
             dropFloaters(arrayClone, highestRow, linesToRemove.length);
 
             // adjusts score state
-            // switch(linesToRemove.length) {
-            //     case 1:
-            //         setScore(scoreRef.current + ((levelRef.current + 1) * 100));
-            //         break;
-            //     case 2:
-            //         setScore(scoreRef.current + ((levelRef.current + 1) * 300));
-            //         break;
-            //     case 3:
-            //         setScore(scoreRef.current + ((levelRef.current + 1) * 500));
-            //         break;
-            //     case 4:
-            //         setScore(scoreRef.current + ((levelRef.current + 1) * 800));
-            //         break;
-            //     default:
-            //         console.log('scoring error, >4 or <1 lines cleared?');
-            //         break;
-            // };
-
-            // adjusts score state
             switch(linesToRemove.length) {
                 case 1:
                     setScore(prevScore => prevScore + ((levelRef.current + 1) * 100));
@@ -455,8 +436,9 @@ const GamePage = ({ user, handleLogout }) => {
         const newTetCoords = coordsRef.current.map((minoCoord) => {
             return [minoCoord[0] - 1, minoCoord[1]];
         });
-
+        
         if (collisionDetection(newTetCoords, coordsRef.current, true)) {
+            lockMovementRef.current = false;
             lockGravityRef.current = true;
             lockDropRef.current = true;
             if (tickStoppedRef.current === false) {
@@ -494,7 +476,6 @@ const GamePage = ({ user, handleLogout }) => {
         }
         else {
             tetRef.current++;
-            // console.log('tet + 1');
         };
         setRotation(0);
         lockHoldPieceRef.current = false;
@@ -512,7 +493,7 @@ const GamePage = ({ user, handleLogout }) => {
     };
 
     // shifts tetromino left, right, or downwards after checking for collision
-    const shiftTetromino = (x, y) => {
+    const shiftTetromino = (x, y, event) => {
         const currentCoords = coordsRef.current;
         const newTetCoords = currentCoords.map((minoCoord) => {
             return [minoCoord[0] + y, minoCoord[1] + x];
@@ -524,7 +505,13 @@ const GamePage = ({ user, handleLogout }) => {
                 lockGravityRef.current = true;
                 setCurrentTetCoords(newTetCoords);
                 updateTetPos(newTetCoords, currentCoords, boardRef.current, true);
+            }
+            else {
+                holdMoveRef.current = event;
             };
+        }
+        else if (gravityInProgressRef.current === true) {
+            holdMoveRef.current = event;
         }
         else if (softDropInProgressRef.current === true) {
             // stops soft drop if collision while soft dropping
@@ -536,7 +523,6 @@ const GamePage = ({ user, handleLogout }) => {
     // starts/stops soft drop interval depending on Boolean parameter
     const softDrop = (startStop) => {
         if (startStop) {
-            // console.log('lock drop', lockDropRef.current)
             softDropInProgressRef.current = true;
             lockGravityRef.current = true;
             window.softDropInterval = setInterval(() => {
@@ -549,14 +535,17 @@ const GamePage = ({ user, handleLogout }) => {
             // if (tickStoppedRef.current === false) {
             //     lockGravityRef.current = false;
             // };
-            checkGravity();
+            console.log('ending softdrop');
+            if (tickStoppedRef.current === false) {
+                checkGravity();
+            }; 
             softDropInProgressRef.current = false;
             lockMovementRef.current = false;
         };
     };
 
     // performs its own collision detection and drops tetromino as far down as possible
-    const hardDrop = () => {
+    const hardDrop = (event) => {
         const currentCoords = coordsRef.current;
         const arrayClone = boardRef.current.map(row => row.slice());
         let lowestSpace;
@@ -590,9 +579,9 @@ const GamePage = ({ user, handleLogout }) => {
 
         // checks whether there is zero space because of the tetromino itself (does nothing) or because of collision (stops function)
         flag.forEach((flaggedMino) => {
-            if (!(currentCoords.some((currentMino) => {
-                return (flaggedMino[1] === currentMino[1] && flaggedMino[0] === (currentMino[0] - 1));
-            }))) {
+            if (!currentCoords.some((currentMino) => {
+                return (flaggedMino[1] === currentMino[1] && (flaggedMino[0] - 1) === currentMino[0]);
+            })) {
                 noSpace = true;
             };
         });
@@ -608,14 +597,18 @@ const GamePage = ({ user, handleLogout }) => {
             return newMinoCoords;
         });
 
-        setCurrentTetCoords(newCoords);
-        setBoardArray(arrayClone);
-        setScore(prevScore => prevScore + (lowestSpace * 2));
+        if (gravityInProgressRef.current === false) {
+            setCurrentTetCoords(newCoords);
+            setBoardArray(arrayClone);
+            setScore(prevScore => prevScore + (lowestSpace * 2));
+        }
+        else {
+            holdMoveRef.current = event;
+        };
     };
 
     // rotates current tetromino
-    const rotateTet = (direction) => {
-        console.log('rotating');
+    const rotateTet = (direction, event) => {
         let rotationIndex = rotationRef.current;
 
         // adjusts rotation index based on current orientation and rotation direction
@@ -652,19 +645,32 @@ const GamePage = ({ user, handleLogout }) => {
         };
 
         // completes rotation if no collision, otherwise performs wall kick
-        if (!collisionDetection(newCoords, coordsRef.current, true)) {
-            setRotation(rotationIndex);
-            setCurrentTetCoords(newCoords);
-            updateTetPos(newCoords, coordsRef.current, boardRef.current, true);
+        if (gravityInProgressRef.current === false && !collisionDetection(newCoords, coordsRef.current, true)) {
+            if (gravityInProgressRef.current === false) {
+                lockGravityRef.current = true;
+                setRotation(rotationIndex);
+                setCurrentTetCoords(newCoords);
+                updateTetPos(newCoords, coordsRef.current, boardRef.current, true);
+            }
+            else {
+                holdMoveRef.current = event;
+            };
         }
-        else {
+        else if (gravityInProgressRef.current === false) {
             const wallKickResult = doWallKick(newCoords, coordsRef.current, `${rotationRef.current}>${rotationIndex}`, tetrominoIndex[bagRef.current[tetRef.current]]);
 
-            if (wallKickResult) {
+            if (wallKickResult && gravityInProgressRef.current === false) {
+                lockGravityRef.current = true;
                 setRotation(rotationIndex);
                 setCurrentTetCoords(wallKickResult);
                 updateTetPos(wallKickResult, coordsRef.current, boardRef.current, true);
+            }
+            else if (gravityInProgressRef.current === true) {
+                holdMoveRef.current = event;
             };
+        }
+        else {
+            holdMoveRef.current = event;
         };
     };
 
@@ -696,7 +702,6 @@ const GamePage = ({ user, handleLogout }) => {
             setShowPauseButton(false);
             pauseRef.current = false;
             lockMovementRef.current = false;
-            // lockDropRef.current = false;
             startGame(true);
         };
     };
@@ -744,13 +749,15 @@ const GamePage = ({ user, handleLogout }) => {
     const controllerFunction = (e) => {
         if (gravityInProgressRef.current === false) {
             if (lockMovementRef.current === false && e.type === 'keydown') {
-                lockMovementRef.current = true;
+                console.log(lockMovementRef.current, gravityInProgressRef.current);
                 switch(e.keyCode) {
                     case 37:
-                        shiftTetromino(-1, 0);
+                        lockMovementRef.current = true;
+                        shiftTetromino(-1, 0, e);
                         break;
                     case 39:
-                        shiftTetromino(1, 0);
+                        lockMovementRef.current = true;
+                        shiftTetromino(1, 0, e);
                         break;
                     case 40:
                         if (lockDropRef.current === false && softDropInProgressRef.current === false) {
@@ -758,20 +765,24 @@ const GamePage = ({ user, handleLogout }) => {
                         };
                         break;
                     case 38:
-                        rotateTet('cw');
+                        lockMovementRef.current = true;
+                        rotateTet('cw', e);
                         break;
                     case 88:
-                        rotateTet('cw');
+                        lockMovementRef.current = true;
+                        rotateTet('cw', e);
                         break;
                     case 90:
-                        rotateTet('ccw');
+                        lockMovementRef.current = true;
+                        rotateTet('ccw', e);
                         break;
                     case 17:
-                        rotateTet('ccw');
+                        lockMovementRef.current = true;
+                        rotateTet('ccw', e);
                         break;
                     case 32:
                         if (lockDropRef.current === false) {
-                            hardDrop();
+                            hardDrop(e);
                         };
                         break;
                     case 16:
@@ -788,8 +799,8 @@ const GamePage = ({ user, handleLogout }) => {
                         break;
                 };
             }
-            else if (e.type === 'keyup' && e.keyCode === 40) {
-                // console.log('stopping because of keyup');
+            else if (e.type === 'keyup' && e.keyCode === 40 && lockDropRef.current === false) {
+                console.log(lockDropRef.current, tickStoppedRef.current);
                 softDrop(false);
             }
             else {
@@ -806,14 +817,17 @@ const GamePage = ({ user, handleLogout }) => {
 
     // clears variables & state and starts a new game 
     const playAgain = () => {
+        setRotation(0);
         setLevel(0);
         setScore(0);
         setLinesCleared(0);
+        setSevenBag([]);
+        setNextSeven([]);
         setBoardArray(emptyBoard);
 
         clearInterval(window.tickInterval);
 
-        bagRef.current = [];
+        bagRef.current = sevenBag;
         tetRef.current = 0;
         lockMovementRef.current = false;
         lockGravityRef.current = false;
@@ -827,7 +841,9 @@ const GamePage = ({ user, handleLogout }) => {
         holdMoveRef.current = '';
 
         setShowGameOver(false);
-        startGame();
+        setTimeout(() => {
+            startGame();
+        }, 100);
     };
 
     // starts game (either 'from scratch' or from a pause depending on parameter value)
@@ -842,7 +858,7 @@ const GamePage = ({ user, handleLogout }) => {
         };
         // interval for gravity function
         window.tickInterval = setInterval(() => {
-            console.log('tick: ', tick);
+            // console.log('tick: ', tick);
             setTick(prevTick => prevTick + 1);
         }, ((0.8 - (levelRef.current * 0.007)) ** levelRef.current) * 1000);
     }; 
@@ -862,6 +878,19 @@ const GamePage = ({ user, handleLogout }) => {
             };
         };
     }, [tick]);
+
+    // useEffect(() => {
+    //     console.log('lockdrop: ', lockDropRef.current);
+    // }, [lockDropRef.current]);
+
+    
+    // useEffect(() => {
+    //     console.log('lockmovement: ', lockMovementRef.current);
+    // }, [lockMovementRef.current]);
+
+    // useEffect(() => {
+    //     console.log('tickstopped: ', tickStoppedRef.current);
+    // }, [tickStoppedRef.current]);
 
     // updates refs and calls the gravity collision check function whenever the board state is changed
     useEffect(() => {
