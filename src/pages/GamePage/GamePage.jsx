@@ -9,6 +9,12 @@ import scoreService from '../../utils/scoreService';
 
 
 const GamePage = ({ user, handleLogout }) => {
+    // const audioObject = new Audio();
+    const audio = new Audio();
+    audio.src = '/assets/music/TetrisTypeA.mp3';
+    audio.loop = true;
+    audio.type = 'audio/mpeg';
+
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     const [showGameOver, setShowGameOver] = useState(false);
@@ -20,6 +26,7 @@ const GamePage = ({ user, handleLogout }) => {
     const [linesCleared, setLinesCleared] = useState(0);
     const [score, setScore] = useState(0);
     const [heldPiece, setHeldPiece] = useState(8);
+    const [audioState, setAudioState] = useState(audio);
     const emptyBoard = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -82,6 +89,7 @@ const GamePage = ({ user, handleLogout }) => {
     const lockGravityRef = useRef(false);
     const lockDropRef = useRef(false);
     const lockHoldPieceRef = useRef(false);
+    const lockPauseRef = useRef(false);
 
     const gravityInProgressRef = useRef(false);
     const softDropInProgressRef = useRef(false);
@@ -205,14 +213,6 @@ const GamePage = ({ user, handleLogout }) => {
         }
     ];
 
-    // const playMusic = () => {
-    // };
-    const audio = new Audio();
-    audio.src = '/assets/music/TetrisTypeA.mp3';
-    audio.loop = true;
-    audio.type = 'audio/mpeg';
-
-
     // generates tetromino HTML for the InfoBox and NextList components
     const generateTetrominoHTML = (tetrominoId) => {
         return (
@@ -324,7 +324,9 @@ const GamePage = ({ user, handleLogout }) => {
         }
         else {
             clearInterval(window.tickInterval);
-            audio.pause();
+            // audio.pause();
+            audioState.pause();
+            // console.log(audio);
             logHighScore();
             setShowGameOver(true);
         };
@@ -708,17 +710,29 @@ const GamePage = ({ user, handleLogout }) => {
     // pauses/unpauses the game
     const pauseGame = () => {
         if (pauseRef.current === false) {
-            audio.pause();
+            console.log('pause');
+            // audio.pause();
+            audioState.pause();
             clearInterval(window.tickInterval);
+            pauseRef.current = true;
+            lockPauseRef.current = true
+            setTimeout(() => {
+                lockPauseRef.current = false;
+            }, 100);
             lockMovementRef.current = true;
             lockDropRef.current = true;
-            pauseRef.current = true;
             setShowPauseButton(true);
         }
         else if (pauseRef.current === true) {
-            audio.play();
+            console.log('unpause');
+            // audio.play();
+            audioState.play();
             setShowPauseButton(false);
             pauseRef.current = false;
+            lockPauseRef.current = true;
+            setTimeout(() => {
+                lockPauseRef.current = false;
+            }, 100);
             lockMovementRef.current = false;
             startGame(true);
         };
@@ -767,7 +781,7 @@ const GamePage = ({ user, handleLogout }) => {
     const controllerFunction = (e) => {
         if (gravityInProgressRef.current === false) {
             if (lockMovementRef.current === false && e.type === 'keydown') {
-                console.log(lockMovementRef.current, gravityInProgressRef.current);
+                // console.log(lockMovementRef.current, gravityInProgressRef.current);
                 switch(e.keyCode) {
                     case 37:
                         lockMovementRef.current = true;
@@ -821,10 +835,10 @@ const GamePage = ({ user, handleLogout }) => {
                 holdMoveRef.current = e;
             };
         }
-        else {
+        else if (e.keyCode !== 27 && e.keyCode !== 112) {
             holdMoveRef.current = e;
         };
-        if (e.type === 'keydown' && (e.keyCode === 27 || e.keyCode === 112)) {
+        if (lockPauseRef.current === false && e.type === 'keydown' && (e.keyCode === 27 || e.keyCode === 112)) {
             pauseGame();
         };
     };
@@ -864,7 +878,9 @@ const GamePage = ({ user, handleLogout }) => {
     const startGame = (unpause = false) => {
         tickStoppedRef.current = false;
         if (unpause === false) {
-            audio.play();
+            // setAudioState(audio.play());
+            audioState.play();
+            // audio.play();
             const startButton = document.getElementById('startButton');
             startButton.style.display = 'none';
             generateBag();
