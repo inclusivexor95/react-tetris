@@ -9,12 +9,6 @@ import scoreService from '../../utils/scoreService';
 
 
 const GamePage = ({ user, handleLogout }) => {
-    // const audioObject = new Audio();
-    const audio = new Audio();
-    audio.src = '/assets/music/TetrisTypeA.mp3';
-    audio.loop = true;
-    audio.type = 'audio/mpeg';
-
     const [sevenBag, setSevenBag] = useState([]);
     const [nextSeven, setNextSeven] = useState([]);
     const [showGameOver, setShowGameOver] = useState(false);
@@ -26,7 +20,6 @@ const GamePage = ({ user, handleLogout }) => {
     const [linesCleared, setLinesCleared] = useState(0);
     const [score, setScore] = useState(0);
     const [heldPiece, setHeldPiece] = useState(8);
-    const [audioState, setAudioState] = useState(audio);
     const emptyBoard = [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -78,7 +71,6 @@ const GamePage = ({ user, handleLogout }) => {
     const nextBagRef = useRef(nextSeven);
     const rotationRef = useRef(rotation);
     const heldPieceRef = useRef(heldPiece);
-    // const scoreRef = useRef(score);
     const linesClearedRef = useRef(linesCleared);
     const levelRef = useRef(level);
 
@@ -96,6 +88,13 @@ const GamePage = ({ user, handleLogout }) => {
     const tetReadyRef = useRef(false);
     const pauseRef = useRef(false);
     const tickStoppedRef = useRef(false);
+
+    // audio
+    const audioObject = new Audio();
+    audioObject.src = '/assets/music/TetrisTypeA.mp3';
+    audioObject.loop = true;
+    audioObject.type = 'audio/mpeg';
+    const audio = useRef(audioObject);
     
     // constant Tetromino data
     const tetrominoIndex = [
@@ -325,7 +324,9 @@ const GamePage = ({ user, handleLogout }) => {
         else {
             clearInterval(window.tickInterval);
             // audio.pause();
-            audioState.pause();
+            // audioState.pause();
+            // setAudioState(audioState.pause());
+            audio.current.pause();
             // console.log(audio);
             logHighScore();
             setShowGameOver(true);
@@ -710,9 +711,7 @@ const GamePage = ({ user, handleLogout }) => {
     // pauses/unpauses the game
     const pauseGame = () => {
         if (pauseRef.current === false) {
-            console.log('pause');
-            // audio.pause();
-            audioState.pause();
+            audio.current.pause();
             clearInterval(window.tickInterval);
             pauseRef.current = true;
             lockPauseRef.current = true
@@ -724,9 +723,7 @@ const GamePage = ({ user, handleLogout }) => {
             setShowPauseButton(true);
         }
         else if (pauseRef.current === true) {
-            console.log('unpause');
-            // audio.play();
-            audioState.play();
+            audio.current.play();
             setShowPauseButton(false);
             pauseRef.current = false;
             lockPauseRef.current = true;
@@ -878,9 +875,8 @@ const GamePage = ({ user, handleLogout }) => {
     const startGame = (unpause = false) => {
         tickStoppedRef.current = false;
         if (unpause === false) {
-            // setAudioState(audio.play());
-            audioState.play();
-            // audio.play();
+            audio.current.play();
+            console.log(audio.current);
             const startButton = document.getElementById('startButton');
             startButton.style.display = 'none';
             generateBag();
@@ -889,7 +885,6 @@ const GamePage = ({ user, handleLogout }) => {
         };
         // interval for gravity function
         window.tickInterval = setInterval(() => {
-            // console.log('tick: ', tick);
             setTick(prevTick => prevTick + 1);
         }, ((0.8 - (levelRef.current * 0.007)) ** levelRef.current) * 1000);
     }; 
@@ -910,18 +905,11 @@ const GamePage = ({ user, handleLogout }) => {
         };
     }, [tick]);
 
-    // useEffect(() => {
-    //     console.log('lockdrop: ', lockDropRef.current);
-    // }, [lockDropRef.current]);
-
-    
-    // useEffect(() => {
-    //     console.log('lockmovement: ', lockMovementRef.current);
-    // }, [lockMovementRef.current]);
-
-    // useEffect(() => {
-    //     console.log('tickstopped: ', tickStoppedRef.current);
-    // }, [tickStoppedRef.current]);
+    useEffect(() => {
+        if (level > 0) {
+            audio.current.playbackRate = 1.00 + (0.15 * level);
+        };
+    }, [level]);
 
     // updates refs and calls the gravity collision check function whenever the board state is changed
     useEffect(() => {
@@ -957,7 +945,7 @@ const GamePage = ({ user, handleLogout }) => {
         <div className="GamePage Wrapper">
             <NavBar user={user} handleLogout={handleLogout} />
             <div className="GameContainer">
-                <InfoBox level={level} score={score} heldPiece={heldPiece} generateTetrominoHTML={generateTetrominoHTML} />
+                <InfoBox level={level} score={score} heldPiece={heldPiece} generateTetrominoHTML={generateTetrominoHTML} audioRef={audio} />
                 <GameBoard startGame={startGame} boardArray={boardArray} showPauseButton={showPauseButton} />
                 <NextList sevenBag={sevenBag} currentTetromino={tetRef.current} nextSeven={nextSeven} generateTetrominoHTML={generateTetrominoHTML} />
                 {showGameOver ? <div id="gameOverContainer"><h2>GAME OVER</h2><button onClick={playAgain} id="playAgainButton"><p>PLAY AGAIN</p></button><Link to='/scores' id="seeScoresButton">See High Scores</Link></div> : null}

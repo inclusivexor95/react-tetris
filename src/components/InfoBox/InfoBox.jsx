@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import ToolBar from '../ToolBar/ToolBar';
 
 
-const InfoBox = ({ score, level, heldPiece, generateTetrominoHTML }) => {
+const InfoBox = ({ score, level, heldPiece, generateTetrominoHTML, audioRef }) => {
     const [heldHTML, setHeldHTML] = useState(<div></div>);
 
     useEffect(() => {
@@ -22,6 +23,7 @@ const InfoBox = ({ score, level, heldPiece, generateTetrominoHTML }) => {
             <div id="scoreContainer">
                 <p>{score}</p>
             </div>
+            <ToolBar audioRef={audioRef} />
             {/* <h2>TIME</h2>
             <div id="timeContainer"></div> */}
         </div>

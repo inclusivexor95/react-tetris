@@ -145,6 +145,28 @@
     flex-wrap: wrap;
 }
 
+.InfoBox .ToolBar {
+    /* border: 1px solid white; */
+    position: absolute;
+    width: 21vh;
+    height: 6vh;
+    bottom: -9vh;
+    right: 0;
+    background: none;
+    color: gray;
+    font-size: calc(1rem + 0.5vw);
+    justify-content: space-evenly;
+}
+
+.ToolBar > svg {
+    cursor: pointer;
+}
+
+.ToolBar a {
+    display: flex;
+    color: gray;
+}
+
 #gameOverContainer {
     position: absolute;
     height: 25%;
