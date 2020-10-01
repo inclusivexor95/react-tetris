@@ -12,4 +12,4 @@ In Tetris, players must complete lines by moving differently shaped pieces (tetr
 
 When the URL (https://matt-react-tetris.herokuapp.com) is initially loaded, a simple landing page is displayed.
 
-![Landing Page Screenshot](/assets/images/landingScreenshot.png)
+![Landing Page Screenshot](/public/assets/images/landingScreenshot.png)
