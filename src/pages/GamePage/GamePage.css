@@ -66,7 +66,6 @@
     border: 1vh solid turquoise;
     top: -1vh;
     background-color: turquoise;
-
 }
 
 .NextList {
@@ -111,12 +110,9 @@
 }
 
 .InfoBox {
-    /* height: 94vh; */
     height: 48vh;
     border-radius: 1rem 0 0 0;
-    
     left: 1vh;
-    
     min-width: 22vh;
 }
 
