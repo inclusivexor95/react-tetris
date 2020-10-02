@@ -18,7 +18,8 @@ function index(req, res) {
 }
 
 function logScore(req, res) {
-    if (req.userBoolean) {
+    console.log(req.user);
+    if (req.user) {
         console.log('working');
         Score.create({...req.body, ...{userName: req.user.name}})
         .then(function(score) {

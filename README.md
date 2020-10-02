@@ -28,6 +28,12 @@ When the game is started, a coloured piece or "Tetromino" will fall from the top
 
 When the Tetrominoes collide with each other or the bottom of the game board they lock into position. The game ends when the Tetrominoes stack too high so as to touch the top of the game board. The object of the game is to last as long as possible without that happening by using the keyboard controls to move the active (falling) Tetromino into different positions.
 
+![Screenshot of game over](/public/assets/images/gameOverScreenshot.png)
+
+Additionally, when multiple Tetrominoes are arranged to form a horizontal line, that line disappears, and everything above it falls down, allowing a skilled user to last almost indefinitely. When a line is cleared (as well as when soft and hard drops are performed), the user scores points. More points are scored the higher the game's level, and also when multiple lines are cleared at the same time. Both the current level and score are shown in the left column component.
+
+Level can be increased by clearing a set number of lines (10 lines for level 1, 20 for level 2, 30 for level 3, etc.). However, in addition to scoring more points, increasing the level also causes the game (and music) to speed up, increasing the difficulty.
+
 ### Keyboard Controls
 
 | Action | Key | Action | Key |
@@ -36,10 +42,6 @@ When the Tetrominoes collide with each other or the bottom of the game board the
 | Right Shift | Right Arrow | Hard Drop | Space |
 | Rotate Clockwise | X or Up Arrow | Hold | C or Shift |
 | Rotate Counterclockwise | Z or Ctrl | Pause | Esc or F1 | 
-
-Additionally, when multiple Tetrominoes are arranged to form a horizontal line, that line disappears, and everything above it falls down, allowing a skilled user to last almost indefinitely. When a line is cleared (as well as when soft and hard drops are performed), the user scores points. More points are scored the higher the game's level, and also when multiple lines are cleared at the same time. Both the current level and score are shown in the left column component.
-
-Level can be increased by clearing a set number of lines (10 lines for level 1, 20 for level 2, 30 for level 3, etc.). However, in addition to scoring more points, increasing the level also causes the game (and music) to speed up, increasing the difficulty.
 
 ### Glossary
 

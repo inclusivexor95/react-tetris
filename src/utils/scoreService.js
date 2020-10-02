@@ -8,18 +8,18 @@ export default {
 };
 
 function index(userBoolean) {
+    console.log(userBoolean);
     const options = {
         method: 'GET',
         headers: {
         'Authorization': 'Bearer ' + tokenService.getToken()
-        },
-        userBoolean: userBoolean
+        }
     };
-    return fetch(BASE_URL, options).then(res => res.json());
+    return fetch(BASE_URL + '?userLoggedIn=' + userBoolean, options).then(res => res.json());
 }
 
 function logScore(score, userBoolean) {
-    console.log(score);
+    console.log(score, userBoolean);
     const options = {
         method: 'POST',
         headers: {
@@ -29,5 +29,5 @@ function logScore(score, userBoolean) {
         userBoolean: userBoolean,
         body: JSON.stringify(score)
     };
-    return fetch(BASE_URL, options).then(res => res.json());
+    return fetch(BASE_URL + '?userLoggedIn=' + userBoolean, options).then(res => res.json());
 }
