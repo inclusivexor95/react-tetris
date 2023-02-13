@@ -1,6 +1,7 @@
 {
     "name": "react-tetris",
     "version": "0.1.0",
+    "homepage": "https://inclusivexor95.github.io/react-tetris",
     "private": true,
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^1.2.30",
@@ -25,6 +26,8 @@
         "serve-favicon": "^2.5.0"
     },
     "scripts": {
+        "predeploy": "npm run build",
+        "deploy": "gh-pages -d build",
         "start": "react-scripts start",
         "build": "react-scripts build",
         "test": "react-scripts test",
@@ -45,5 +48,8 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "http://localhost:3001"
+    "proxy": "http://localhost:3001",
+    "devDependencies": {
+        "gh-pages": "^5.0.0"
+    }
 }
